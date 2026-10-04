@@ -3,7 +3,9 @@
 *.crx
 *.pem
 node_modules/
-# JS gerado pelo tsc a partir dos .ts (npm run build)
+# extensão montada por npm run build (não versionada: é refeita a cada build)
+dist/
+# JS que o tsc gerava ao lado dos .ts, antes do outDir dist/
 src/*.js
 pages/coleta.js
 pages/painel/carregar.js

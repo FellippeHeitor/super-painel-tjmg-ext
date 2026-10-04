@@ -6,7 +6,7 @@ Extensão que lê os painéis Qlik Sense do TJMG **direto do navegador** e monta
 - **Qualquer comarca.** A lista vem do próprio Qlik. A grafia de cada painel ("MINAS NOVAS" x "Minas Novas") é resolvida automaticamente, sem diferenciar acentos nem maiúsculas. Se não houver equivalente exato, o painel não é coletado.
 - **Salvaguarda.** Se o filtro da comarca não pegar, a coleta daquele painel falha e nada é gravado (senão viriam números do estado inteiro).
 
-Sucessor do robô em Python/Playwright `super-painel-tjmg`, que exigia um PC dedicado, o SQLite e a publicação no Cloudflare.
+Sucessor do robô em Python/Playwright do Super Painel TJMG, que exigia um PC dedicado, o SQLite e a publicação no Cloudflare.
 
 ## Instalar
 
@@ -37,3 +37,8 @@ Sucessor do robô em Python/Playwright `super-painel-tjmg`, que exigia um PC ded
 | `src/dados.js` | monta os dados do painel a partir das coletas (porte do `site.py`) |
 | `pages/painel.html`, `pages/painel/*.js` | o painel (o mesmo front-end do site anterior) |
 | `pages/coleta.*` | comarca, coleta com progresso, agendamento, apagar dados |
+
+## Créditos
+
+- **Bernardo Vieira**: criador do Super Painel TJMG. A ideia, o robô original de coleta, o mapeamento dos painéis Qlik (campos, indicadores e expressões) e o painel web que esta extensão reaproveita.
+- **Fellippe Heitor**: extensão do Chrome, que leva esse trabalho para dentro do navegador e o torna utilizável por qualquer comarca.

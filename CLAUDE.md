@@ -1,6 +1,6 @@
 # Super Painel TJMG — extensão
 
-Extensão Chrome MV3 que substitui o robô Python/Playwright (`~/Desktop/super-painel-tjmg`; o CLAUDE.md de lá tem todo o mapeamento dos painéis: campos, KPIs, expressões, armadilhas).
+Extensão Chrome MV3 que substitui o robô Python/Playwright do Super Painel TJMG, criado por Bernardo Vieira (autor original da funcionalidade: mapeamento dos painéis Qlik, campos, KPIs, expressões e o painel web, que esta extensão reaproveita). Ao mudar algo herdado do robô, preservar o crédito no README.
 
 Regras: código e comentários em português; nunca inventar campos/valores/seletores do Qlik; nunca exibir números sem o filtro da comarca confirmado (`GetSelectedCount`); nenhum dado em repositório ou servidor (LGPD): tudo fica no navegador; robustez > velocidade.
 

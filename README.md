@@ -1,6 +1,6 @@
 # Super Painel TJMG (extensão do Chrome)
 
-Extensão que lê os painéis Qlik Sense do TJMG **direto do navegador** e monta um painel de indicadores da comarca escolhida: movimentação por sistema (PJe, eProc, SEEU, SISCOM), conclusões por dia e por mês, tarefas e documentos pendentes, acervo, migração PJe → eProc, apoio ao planejamento e Metas Nacionais do CNJ. Inclui as relações de processos, com busca, filtros e exportação em CSV.
+Extensão que lê os painéis Qlik Sense do TJMG **direto do navegador** e monta um painel de indicadores da comarca escolhida: movimentação por sistema (PJe, eProc, SEEU, SISCOM), conclusões por dia e por mês, tarefas e documentos pendentes, acervo, migração PJe → eProc, apoio ao planejamento e Metas Nacionais do CNJ. Inclui as relações de processos, com busca, filtros e exportação em CSV e XLSX (gerados no navegador).
 
 - **Sem servidor e sem dados no repositório.** A coleta abre o `qlik.tjmg.jus.br` num quadro invisível dentro da própria página de coleta, sem abrir abas. Números e relações de processos ficam só no IndexedDB deste navegador.
 - **Qualquer comarca.** A lista vem do próprio Qlik. A grafia de cada painel ("ESPERA FELIZ" x "Espera Feliz") é resolvida automaticamente, sem diferenciar acentos nem maiúsculas. Se não houver equivalente exato, o painel não é coletado.
@@ -37,6 +37,7 @@ Sucessor do robô em Python/Playwright do Super Painel TJMG, que exigia um PC de
 | `src/coleta.ts`, `src/conclusoes.ts`, `src/listas.ts` | coleta por painel, conclusões PJe + eProc, relações de processos e listas do Apoio sem duplicidade |
 | `src/rotina.ts` | rotina completa (painéis devidos + conclusões + Apoio), com trava contra execução dupla |
 | `src/db.ts` | IndexedDB: histórico de coletas (última de cada dia, 120 dias) e relações de processos |
+| `src/xlsx.ts` | gera o .xlsx das listas no navegador (sem biblioteca externa) |
 | `src/dados.ts` | monta os dados do painel a partir das coletas (porte do `site.py`) |
 | `pages/painel.html`, `pages/painel/*.js` | o painel (o mesmo front-end do site anterior, mantido em JavaScript); `carregar.ts` monta os dados |
 | `pages/coleta.*` | comarca, coleta com progresso, agendamento, apagar dados |

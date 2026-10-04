@@ -66,7 +66,7 @@ function gravarPref(k, v){ try { localStorage.setItem(k, v); } catch (e) { /* se
 function aplicarTema(t){
   if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t);
   const b = document.getElementById('tema');
-  b.replaceChildren(ico('tema', 18), el('span', {class: 'vh'}, 'Tema: ' + ROT_TEMA[t]));
+  b.replaceChildren(el('span', {'aria-hidden': 'true', style: 'font-size:18px;line-height:1'}, '🌗'), el('span', {class: 'vh'}, 'Tema: ' + ROT_TEMA[t]));
   b.title = 'Tema: ' + ROT_TEMA[t] + ' (clique para alternar)';
 }
 

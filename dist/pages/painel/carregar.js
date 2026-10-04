@@ -1,6 +1,7 @@
 // Monta os dados a partir do IndexedDB e só então carrega os scripts do painel (clássicos, em ordem; usam D/P globais).
 // Sem coleta ainda: vai direto para a página de coleta (escolher a comarca e coletar).
 import { montar } from '../../src/dados.js';
+import { xlsx } from '../../src/xlsx.js';
 const SCRIPTS = ['00_base.js', '10_dados.js', '20_visao.js', '30_processos.js', '40_views.js', '90_main.js'];
 function carregarEmOrdem(lista) {
     return lista.reduce((p, arq) => p.then(() => new Promise((ok, erro) => {
@@ -36,6 +37,7 @@ else if ('erro' in r)
 else {
     window.__D = r.D;
     window.__P = r.P;
+    window.__xlsx = xlsx; // exportação XLSX das listas (30_processos.js)
     document.getElementById('brand-comarca').textContent = 'COMARCA DE ' + r.D.comarca.toUpperCase();
     await carregarEmOrdem(SCRIPTS);
 }

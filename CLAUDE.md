@@ -18,4 +18,6 @@ Front-end: `pages/painel/*.js` são os templates do site antigo com mudanças m�
 
 Teste automatizado: Playwright em cache (`~/.npm/_npx/.../playwright-core` 1.61) + Chrome for Testing 1228, `--load-extension`, headless. Harness no scratchpad da sessão (não versionado).
 
-Pendências: ícones; XLSX das listas (hoje só CSV pelo painel); publicar na Chrome Web Store (não listada) se a política do TJMG bloquear "Carregar sem compactação".
+Exportação das listas: CSV e XLSX (`src/xlsx.ts`, gerado no navegador, exposto como `window.__xlsx`). Google Planilhas descartado (04/10/2026): enviaria as listas, com processos em segredo de justiça, a servidor do Google.
+
+Pendências: ícones; publicar na Chrome Web Store (não listada) se a política do TJMG bloquear "Carregar sem compactação".

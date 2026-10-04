@@ -45,13 +45,14 @@ function viewProcessos(raiz){
     const info = el('p', {class: 'meta'}), faixas = el('div', {class: 'chips', role: 'group', 'aria-label': 'Atalhos de dias e prioridade'});
     const busca = el('input', {type: 'search', placeholder: 'Pesquisar processo, tarefa, classe ou assunto…', 'aria-label': 'Pesquisar nesta lista'});
     const btnCsv = el('button', {class: 'btn', type: 'button'}, ico('baixar', 16), 'Exportar CSV');
+    const btnXlsx = el('button', {class: 'btn', type: 'button'}, ico('baixar', 16), 'Exportar XLSX');
     const selPor = el('select', {'aria-label': 'Registros por página'}, ...[25, 50, 100, 200].map(n => el('option', {value: n}, `${n} por página`)));
     selPor.value = String(por);
     const avancados = el('details', {class: 'avancados'}, el('summary', {}, 'Filtros avançados'));
     const filtrosBox = el('div', {class: 'filtros'}); avancados.append(filtrosBox);
     const inDias = el('input', {type: 'number', min: '0', 'aria-label': 'Dias mínimos', placeholder: 'Dias ≥'});
     const tabelaDiv = el('div', {class: 'tproc'}), pagDiv = el('div', {class: 'pag'});
-    corpo.append(abas, info, el('div', {class: 'barra-busca'}, busca, selPor, btnCsv), faixas, avancados, tabelaDiv, pagDiv);
+    corpo.append(abas, info, el('div', {class: 'barra-busca'}, busca, selPor, btnCsv, btnXlsx), faixas, avancados, tabelaDiv, pagDiv);
 
     const idx = (n) => atual.colunas.indexOf(n);
     let selects = [];
@@ -129,12 +130,19 @@ function viewProcessos(raiz){
     busca.addEventListener('input', () => { q = busca.value; pag = 0; desenhar(); });
     selPor.addEventListener('change', () => { por = +selPor.value; pag = 0; desenhar(); });
     inDias.addEventListener('input', () => { diasMin = inDias.value; pag = 0; desenhar(); });
+    const baixar = (blob, ext) => {
+      const url = URL.createObjectURL(blob);
+      const a = el('a', {href: url, download: 'processos_' + atual.id.replace(/[^\w]+/g, '_') + '.' + ext});
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    };
     btnCsv.addEventListener('click', () => {
       const aspas = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
       const txt = '﻿' + [atual.colunas.map(aspas).join(';'), ...linhasFiltradas().map(l => l.map(aspas).join(';'))].join('\r\n');
-      const a = el('a', {href: URL.createObjectURL(new Blob([txt], {type: 'text/csv;charset=utf-8'})), download: 'processos_' + atual.id.replace(/[^\w]+/g, '_') + '.csv'});
-      document.body.append(a); a.click(); a.remove();
+      baixar(new Blob([txt], {type: 'text/csv;charset=utf-8'}), 'csv');
     });
+    // mesmas linhas do CSV (com busca e filtros atuais), gerado no navegador
+    btnXlsx.addEventListener('click', () => baixar(window.__xlsx(atual.colunas, linhasFiltradas(), String(atual.rotulo).split(' · ')[0]), 'xlsx'));
     // aplicado por deep link (#processos?fonte=…&dias=…&q=…) e pelos atalhos de outras visões
     window.__procAplicar = (params) => {
       const alvo = params.get('fonte'), f = fontes.find(x => x.id === alvo || x.nome === alvo || x.id === 'pend' && alvo === 'pendentes') || (alvo ? null : atual);

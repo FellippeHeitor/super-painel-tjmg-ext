@@ -10,7 +10,7 @@ Decisões (04/10/2026):
 - Grafia da comarca resolvida por app (sem acento/maiúsculas, exatamente 1 equivalente), com cache em chrome.storage.local (`grafia|COMARCA|appid|campo`); se a seleção não pegar, resolve de novo uma vez.
 - O Qlik do TJMG é acessível fora da Rede TJMG (confirmado pelo usuário e em teste automatizado).
 
-Código em TypeScript (`tsc`, sem bundler): `npm run build` gera os `.js` ao lado dos `.ts` (ignorados no git) e a própria pasta do repositório é carregada no Chrome (não mudar: outra pasta = outro ID de extensão = perde o IndexedDB); `npm run check` só verifica tipos. Tipos compartilhados em `src/tipos.ts`. Os templates `pages/painel/0*-90*.js` continuam em JS e versionados.
+Código em TypeScript (`tsc`, sem bundler): `npm run build` gera `dist/` (versionado), que é a pasta carregada no Chrome (não mudar: outra pasta = outro ID de extensão = perde o IndexedDB); `npm run check` só verifica tipos. Tipos compartilhados em `src/tipos.ts`. Os templates `pages/painel/0*-90*.js` continuam em JS, versionados, e o build os copia para `dist/`.
 
 Mecanismo: `src/gancho-ws.ts` (content script, world MAIN, document_start) anota a URL do WebSocket da Engine; `src/qlik.ts` mantém UMA aba de trabalho em segundo plano e executa `src/engine.ts` nela via `chrome.scripting.executeScript({world: 'MAIN'})`. `engine.ts` é serializado pelo Chrome: não pode depender de nada fora da função (só `import type`). A rotina roda numa página da extensão (`pages/coleta.html`, `?auto=1` quando disparada pelo alarme), não no service worker (limite de vida do SW).
 

@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "watch": "node scripts/build.mjs && tsc -p tsconfig.json --watch --preserveWatchOutput"
   },
   "devDependencies": {
     "@types/chrome": "^0.3.4",

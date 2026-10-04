@@ -1,5 +1,5 @@
 // Monta os dados a partir do IndexedDB e só então carrega os scripts do painel (clássicos, em ordem; usam D/P globais).
-// Sem coleta ainda: mostra o convite para configurar a comarca e coletar.
+// Sem coleta ainda: vai direto para a página de coleta (escolher a comarca e coletar).
 import { montar } from '../../src/dados.js';
 const SCRIPTS = ['00_base.js', '10_dados.js', '20_visao.js', '30_processos.js', '40_views.js', '90_main.js'];
 function carregarEmOrdem(lista) {
@@ -12,8 +12,9 @@ function carregarEmOrdem(lista) {
     })), Promise.resolve());
 }
 function semDados(msg) {
-    document.querySelector('.shell').hidden = true;
-    document.getElementById('rodape').hidden = true;
+    // style.display, não `hidden`: o CSS do painel (.shell{display:grid}) sobrepõe o atributo hidden
+    document.querySelector('.shell').style.display = 'none';
+    document.getElementById('rodape').style.display = 'none';
     const caixa = document.createElement('div');
     caixa.className = 'vazio';
     const h = document.createElement('h1');
@@ -29,7 +30,7 @@ function semDados(msg) {
 }
 const r = await montar().catch((e) => ({ erro: e }));
 if (!r)
-    semDados('Ainda não há dados neste navegador.');
+    location.replace('coleta.html');
 else if ('erro' in r)
     semDados('Não foi possível ler os dados locais: ' + (r.erro.message || r.erro));
 else {

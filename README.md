@@ -10,9 +10,9 @@ Sucessor do robô em Python/Playwright do Super Painel TJMG, que exigia um PC de
 
 ## Instalar
 
-1. `npm install` e `npm run build` (o código é TypeScript; o `tsc` gera os `.js` ao lado dos `.ts`). Depois de mudar um `.ts`: `npm run build` (ou `npm run watch`) e recarregar a extensão.
+1. `npm install` e `npm run build` (o código é TypeScript; a extensão pronta fica em `dist/`). Depois de mudar um `.ts`: `npm run build` (ou `npm run watch`) e recarregar a extensão.
 2. `chrome://extensions` → ligar o **Modo do desenvolvedor**.
-3. **Carregar sem compactação** → selecionar esta pasta.
+3. **Carregar sem compactação** → selecionar a pasta `dist/`.
 4. Clicar no ícone da extensão → abre o painel. Na primeira vez: **Escolher a comarca e coletar os dados**.
 
 ## Uso

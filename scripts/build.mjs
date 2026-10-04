@@ -1,7 +1,7 @@
 // Monta a extensão em dist/ (é essa pasta que se carrega em chrome://extensions → "Carregar sem compactação").
 // O TypeScript (src/, pages/coleta.ts, pages/painel/carregar.ts) é compilado pelo tsc; o resto é copiado como está.
 import { execFileSync } from 'node:child_process';
-import { cpSync, rmSync, readdirSync } from 'node:fs';
+import { cpSync, rmSync, readdirSync, existsSync } from 'node:fs';
 
 const DIST = 'dist';
 rmSync(DIST, { recursive: true, force: true });
@@ -19,6 +19,6 @@ if (!compilou) { console.error('tsc não encontrado: rode npm install'); process
 cpSync('manifest.json', `${DIST}/manifest.json`);
 cpSync('config', `${DIST}/config`, { recursive: true });
 for (const f of readdirSync('pages')) if (f.endsWith('.html') || f.endsWith('.css')) cpSync(`pages/${f}`, `${DIST}/pages/${f}`);
-// templates do painel antigo: continuam em JavaScript (mudanças mínimas)
-for (const f of readdirSync('pages/painel')) if (f.endsWith('.js')) cpSync(`pages/painel/${f}`, `${DIST}/pages/painel/${f}`);
+// templates do painel antigo: continuam em JavaScript (mudanças mínimas). Pula .js que tenha .ts (ex.: carregar.js velho), senão sobrescreveria o compilado.
+for (const f of readdirSync('pages/painel')) if (f.endsWith('.js') && !existsSync(`pages/painel/${f.slice(0, -3)}.ts`)) cpSync(`pages/painel/${f}`, `${DIST}/pages/painel/${f}`);
 console.log(`extensão montada em ${DIST}/`);

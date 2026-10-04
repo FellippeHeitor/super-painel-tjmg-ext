@@ -12,7 +12,6 @@
   },
   "permissions": [
     "tabs",
-    "scripting",
     "storage",
     "alarms"
   ],
@@ -25,10 +24,12 @@
         "https://qlik.tjmg.jus.br/*"
       ],
       "js": [
-        "src/gancho-ws.js"
+        "src/gancho-ws.js",
+        "src/engine.js"
       ],
       "run_at": "document_start",
-      "world": "MAIN"
+      "world": "MAIN",
+      "all_frames": true
     }
   ]
 }

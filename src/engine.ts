@@ -1,17 +1,24 @@
-// Executa um "job" na Engine API do Qlik DENTRO da aba do qlik.tjmg.jus.br (WebSocket próprio, só leitura).
-// Portado de super-painel-tjmg/app/engine.js. Chamado por src/qlik.ts via chrome.scripting.executeScript({world: 'MAIN'}).
-// A função é serializada pelo Chrome: não pode usar nada de fora dela (imports, variáveis do módulo). Só `import type`.
+// Content script da página do Qlik (world MAIN, todos os frames). Executa um "job" na Engine API (WebSocket próprio, só leitura).
+// Portado de super-painel-tjmg/app/engine.js. A página da extensão que roda a coleta (src/qlik.ts) embute o Qlik num iframe
+// invisível e conversa com este script por postMessage: {tipo:'ws'} (URL anotada por gancho-ws.ts), {tipo:'job'}, {tipo:'dialogo'}.
+// Script clássico (não módulo): sem import/export; tipos só por import('./tipos.js').
 // job = {sheet, selecoes:[[campo,valor,estado?]], dinamicos:[{campo,tipo:'ultimo'}],
 //        itens:[{nome, tipo:'valor'|'serie'|'cubo'|'tabela'|'prop'|'exprs'|'campo', ...}], timeout_ms?}
 // Resultado: {selecoes:[{campo,valor,ok}], itens:{nome: resultado | {erro}}} ou {erro}
-import type { Celula, ItemJob, Job, ResultadoItem, ResultadoJob, ResultadoOk } from './tipos.js';
+(() => {
+type Celula = import('./tipos.js').Celula;
+type ItemJob = import('./tipos.js').ItemJob;
+type Job = import('./tipos.js').Job;
+type ResultadoItem = import('./tipos.js').ResultadoItem;
+type ResultadoJob = import('./tipos.js').ResultadoJob;
+type ResultadoOk = import('./tipos.js').ResultadoOk;
 
 // Respostas JSON-RPC da Engine: estrutura do Qlik, não tipada aqui.
 type Qlik = any;
 interface Objeto { id: string; tipo: string; h: number; L: Qlik; hc: Qlik; titulo: string; dims: string[]; meds: string[] }
 interface Cubo { colunas: string[]; nd: number; total: number; linhas: Qlik[][] }
 
-export const engine = ([wsurl, job]: [string, Job]) => new Promise<ResultadoJob>((res) => {
+const engine = (wsurl: string, job: Job) => new Promise<ResultadoJob>((res) => {
   let feito = false, id = 0;
   const p: Record<number, (d: Qlik) => void> = {};
   const fim = (r: ResultadoJob) => { if (!feito) { feito = true; clearTimeout(lim); try { ws.close(); } catch (e) {} res(r); } };
@@ -241,3 +248,29 @@ export const engine = ([wsurl, job]: [string, Job]) => new Promise<ResultadoJob>
     } catch (e) { fim({erro: String((e as Error).message || e)}); }
   };
 });
+
+// Diálogo "Conexão perdida... atualizar para continuar": clica em "Atualizar". true se clicou.
+function tratarDialogo(): boolean {
+  const texto = document.body ? document.body.innerText : '';
+  if (!/conex[ãa]o perdida|connection lost|atualizar para continuar/i.test(texto)) return false;
+  const bt = [...document.querySelectorAll('button')].find((b) => /^\s*(atualizar|refresh)\s*$/i.test(b.textContent || ''));
+  if (bt) { bt.click(); return true; }
+  return false;
+}
+
+// Só atende quando esta página é o iframe de uma página de extensão (nunca o Qlik aberto normalmente numa aba,
+// nem os iframes internos do próprio Qlik). O world MAIN não sabe o ID da extensão; a origem é conferida pelo prefixo.
+window.addEventListener('message', async (e: MessageEvent) => {
+  if (window === window.top || e.source !== window.parent || !/^chrome-extension:\/\//.test(e.origin)) return;
+  const m = e.data;
+  if (!m || m.superPainel !== 1) return;
+  let resposta: unknown;
+  try {
+    if (m.tipo === 'ws') resposta = (window.__superPainelWs || []).find((x) => x.includes('/app/' + m.appid)) || null;
+    else if (m.tipo === 'dialogo') resposta = tratarDialogo();
+    else if (m.tipo === 'job') resposta = await engine(m.ws, m.job);
+    else return;
+  } catch (err) { resposta = {erro: String((err as Error).message || err)}; }
+  window.parent.postMessage({superPainel: 1, id: m.id, resposta}, e.origin);
+});
+})();

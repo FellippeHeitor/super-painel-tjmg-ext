@@ -66,7 +66,10 @@ async function rodar(opcoes) {
   $('log').replaceChildren();
   try {
     const r = await rotina.executar(log, opcoes);
-    if (r.codigo !== 2) log('Abra o painel para ver os dados.', '');
+    if (r.codigo === 0 && !auto) {   // sem falhas: abre o painel sozinho; com falha, fica o log para o usuário ver o motivo
+      log('Abrindo o painel…');
+      setTimeout(() => { location.href = 'painel.html'; }, 1500);
+    } else if (r.codigo !== 2) log('Abra o painel para ver os dados.', '');
     return r;
   } finally { ocupar(false); }
 }

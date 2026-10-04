@@ -3,7 +3,7 @@
 Extensão que lê os painéis Qlik Sense do TJMG **direto do navegador** e monta um painel de indicadores da comarca escolhida: movimentação por sistema (PJe, eProc, SEEU, SISCOM), conclusões por dia e por mês, tarefas e documentos pendentes, acervo, migração PJe → eProc, apoio ao planejamento e Metas Nacionais do CNJ. Inclui as relações de processos, com busca, filtros e exportação em CSV.
 
 - **Sem servidor e sem dados no repositório.** A coleta roda numa aba do `qlik.tjmg.jus.br` aberta em segundo plano pela extensão. Números e relações de processos ficam só no IndexedDB deste navegador.
-- **Qualquer comarca.** A lista vem do próprio Qlik. A grafia de cada painel ("MINAS NOVAS" x "Minas Novas") é resolvida automaticamente, sem diferenciar acentos nem maiúsculas. Se não houver equivalente exato, o painel não é coletado.
+- **Qualquer comarca.** A lista vem do próprio Qlik. A grafia de cada painel ("ESPERA FELIZ" x "Espera Feliz") é resolvida automaticamente, sem diferenciar acentos nem maiúsculas. Se não houver equivalente exato, o painel não é coletado.
 - **Salvaguarda.** Se o filtro da comarca não pegar, a coleta daquele painel falha e nada é gravado (senão viriam números do estado inteiro).
 
 Sucessor do robô em Python/Playwright do Super Painel TJMG, que exigia um PC dedicado, o SQLite e a publicação no Cloudflare.

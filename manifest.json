@@ -3,8 +3,18 @@
   "name": "Super Painel TJMG",
   "version": "0.2.0",
   "description": "Painel de indicadores da comarca a partir dos painéis Qlik da Rede TJMG. Os dados ficam só no navegador.",
+  "icons": {
+    "16": "icones/icone-16.png",
+    "32": "icones/icone-32.png",
+    "48": "icones/icone-48.png",
+    "128": "icones/icone-128.png"
+  },
   "action": {
-    "default_title": "Super Painel TJMG"
+    "default_title": "Super Painel TJMG",
+    "default_icon": {
+      "16": "icones/icone-16.png",
+      "32": "icones/icone-32.png"
+    }
   },
   "background": {
     "service_worker": "src/background.js",

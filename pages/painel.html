@@ -5,14 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light dark">
+<link rel="icon" href="../icones/icone-32.png">
 <title>Super Painel TJMG</title>
 <style>
 /* ===== Design system: tokens ===== */
 :root{
   --bg:#f3f5f9;--surface:#fff;--surface-2:#f7f9fc;--bd:#d9e0ea;--tx:#0f1b2d;--mut:#44546a;
-  --brand:#123a73;--accent:#1c5cc8;--accent-soft:#e6eefc;
+  --brand:#131f36;--minas:#d32f2f;--accent:#1c5cc8;--accent-soft:#e6eefc;
   --ok:#15803d;--ok-soft:#e5f5ea;--warn:#a85a00;--warn-soft:#fdf0dc;--crit:#b42318;--crit-soft:#fde8e6;--info:#0b6a8f;--info-soft:#e3f2f8;
-  --side-bg:#0f2a52;--side-tx:#d3e2ff;--side-act:#1f5fc4;
+  --side-bg:#1a2a45;--side-tx:#d3e2ff;--side-act:#1f5fc4;
   --c1:#1c5cc8;--c2:#15803d;--c3:#c2610c;--c4:#6b46c1;
   --sh:0 1px 2px rgb(15 27 45 / .06),0 1px 3px rgb(15 27 45 / .08);--r:12px;--r-sm:8px;--gap:16px;
   --fs-title:1.6rem;--fs-mod:1.15rem;--fs-sub:.88rem;--fs-kpi:2rem;--fs-lab:.78rem;--fs-tab:.84rem;
@@ -20,11 +21,11 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0b1322;--surface:#131f36;--surface-2:#182744;--bd:#2a3b5c;--tx:#e9eefb;--mut:#a9b8d3;
   --accent:#6fa3ff;--accent-soft:#1b2f57;--ok:#4ade80;--ok-soft:#12301f;--warn:#fbbf5a;--warn-soft:#3a2a0d;--crit:#ff8a80;--crit-soft:#3d1713;--info:#5cc4ea;--info-soft:#0f2f3d;
-  --side-bg:#08162d;--side-tx:#c5d6f7;--side-act:#2563d6;--c1:#6fa3ff;--c2:#4ade80;--c3:#fb923c;--c4:#b794f4;--sh:0 1px 2px rgb(0 0 0 / .4);}}
+  --brand:#0f1a2e;--side-bg:#0d1729;--side-tx:#c5d6f7;--side-act:#2563d6;--c1:#6fa3ff;--c2:#4ade80;--c3:#fb923c;--c4:#b794f4;--sh:0 1px 2px rgb(0 0 0 / .4);}}
 :root[data-theme="dark"]{
   --bg:#0b1322;--surface:#131f36;--surface-2:#182744;--bd:#2a3b5c;--tx:#e9eefb;--mut:#a9b8d3;
   --accent:#6fa3ff;--accent-soft:#1b2f57;--ok:#4ade80;--ok-soft:#12301f;--warn:#fbbf5a;--warn-soft:#3a2a0d;--crit:#ff8a80;--crit-soft:#3d1713;--info:#5cc4ea;--info-soft:#0f2f3d;
-  --side-bg:#08162d;--side-tx:#c5d6f7;--side-act:#2563d6;--c1:#6fa3ff;--c2:#4ade80;--c3:#fb923c;--c4:#b794f4;--sh:0 1px 2px rgb(0 0 0 / .4);}
+  --brand:#0f1a2e;--side-bg:#0d1729;--side-tx:#c5d6f7;--side-act:#2563d6;--c1:#6fa3ff;--c2:#4ade80;--c3:#fb923c;--c4:#b794f4;--sh:0 1px 2px rgb(0 0 0 / .4);}
 
 /* ===== base ===== */
 *{box-sizing:border-box}
@@ -45,9 +46,11 @@ button{font:inherit;color:inherit}
 a{color:var(--accent)}
 
 /* ===== casca: topo + lateral + conteúdo ===== */
-.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14px;padding:8px 16px;background:var(--brand);color:#fff;box-shadow:var(--sh)}
-.brand{display:flex;flex-direction:column;line-height:1.15;min-width:0}
-.brand b{letter-spacing:.06em;font-size:1rem}.brand span{font-size:.72rem;opacity:.85;letter-spacing:.04em}
+.topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14px;padding:8px 16px;background:var(--brand);color:#fff;box-shadow:inset 0 -3px 0 var(--minas),var(--sh)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand .logo{flex:none;display:block}
+.brand div{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.brand b{letter-spacing:.06em;font-size:1rem;white-space:nowrap}.brand span{font-size:.72rem;opacity:.85;letter-spacing:.04em}
 .icon-btn{background:transparent;border:1px solid rgb(255 255 255 / .35);color:#fff;border-radius:8px;padding:6px 9px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .icon-btn:hover{background:rgb(255 255 255 / .12)}
 #menu-btn{display:none}
@@ -188,7 +191,7 @@ body[data-modo="gerencial"] .detalhe{display:none}
   .fontes,.fresh span.det{display:none}
   main{padding:14px}
 }
-@media (max-width:560px){.fresh{display:none}.brand span{display:none}.view-head{align-items:flex-start}}
+@media (max-width:560px){.fresh{display:none}.brand div{display:none}.view-head{align-items:flex-start}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 @media print{
   .topbar,.side,.gsearch,.chips,.barra-busca,details.avancados,.pag button,.btn,.tabs{display:none!important}
@@ -200,13 +203,14 @@ body[data-modo="gerencial"] .detalhe{display:none}
   .btn-atualizar:hover{background:rgb(255 255 255 / .12)}
   @media print{.btn-atualizar{display:none}}
   .vazio { max-width: 560px; margin: 12vh auto; padding: 24px; text-align: center; font: 16px/1.5 system-ui, sans-serif; }
+  .vazio .logo { display: block; margin: 0 auto 12px; }
 </style>
 </head>
 <body data-modo="detalhado">
 <a class="skip" href="#conteudo">Ir para o conteúdo</a>
 <header class="topbar" role="banner">
   <button id="menu-btn" class="icon-btn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="side"></button>
-  <div class="brand"><b>SUPER PAINEL</b><span id="brand-comarca"></span></div>
+  <div class="brand"><img class="logo" src="../icones/super-painel.svg" width="32" height="32" alt=""><div><b>SUPER PAINEL</b><span id="brand-comarca"></span></div></div>
   <div class="gsearch" role="search">
     <span class="lupa" id="lupa"></span>
     <input id="gs" type="search" placeholder="Pesquisar processo, tarefa, classe, assunto ou módulo…" aria-label="Pesquisa global" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="gres">

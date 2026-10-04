@@ -18,6 +18,8 @@ if (!compilou) { console.error('tsc não encontrado: rode npm install'); process
 
 cpSync('manifest.json', `${DIST}/manifest.json`);
 cpSync('config', `${DIST}/config`, { recursive: true });
+// ícones: os PNG (manifest) e o SVG grande, que é a logo no topo das páginas (o SVG de 16 px e o gerador ficam fora; ver scripts/icones.mjs)
+for (const f of readdirSync('icones')) if (f.endsWith('.png') || f === 'super-painel.svg') cpSync(`icones/${f}`, `${DIST}/icones/${f}`);
 for (const f of readdirSync('pages')) if (f.endsWith('.html') || f.endsWith('.css')) cpSync(`pages/${f}`, `${DIST}/pages/${f}`);
 // templates do painel antigo: continuam em JavaScript (mudanças mínimas). Pula .js que tenha .ts (ex.: carregar.js velho), senão sobrescreveria o compilado.
 for (const f of readdirSync('pages/painel')) if (f.endsWith('.js') && !existsSync(`pages/painel/${f.slice(0, -3)}.ts`)) cpSync(`pages/painel/${f}`, `${DIST}/pages/painel/${f}`);

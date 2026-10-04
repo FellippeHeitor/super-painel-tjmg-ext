@@ -20,4 +20,6 @@ Teste automatizado: Playwright em cache (`~/.npm/_npx/.../playwright-core` 1.61)
 
 Exportação das listas: CSV e XLSX (`src/xlsx.ts`, gerado no navegador, exposto como `window.__xlsx`). Google Planilhas descartado (04/10/2026): enviaria as listas, com processos em segredo de justiça, a servidor do Google.
 
-Pendências: ícones; publicar na Chrome Web Store (não listada) se a política do TJMG bloquear "Carregar sem compactação".
+Ícones (04/10/2026): triângulo da bandeira de Minas com a linha de crescimento saindo dele (sem lema, brasão ou logo do TJMG, para não parecer oficial). Fontes em `icones/*.svg` (`super-painel-16.svg` é redesenhado para 16/32 px, não reduzir o grande); `node scripts/icones.mjs` gera os PNG versionados rasterizando no Chrome via playwright-core; o build copia os PNG e o SVG grande (logo no topo do painel e da coleta). Identidade: topo e lateral em azul-marinho `#131f36`; o vermelho de Minas `#d32f2f` (`--minas`) só na marca (logo e faixa sob o topo), nunca em botão/aba/gráfico, porque vermelho na interface é `--crit`.
+
+Pendências: publicar na Chrome Web Store (não listada) se a política do TJMG bloquear "Carregar sem compactação".

@@ -4,16 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
+<link rel="icon" href="../icones/icone-32.png">
 <title>Super Painel TJMG — coleta</title>
 <style>
-  :root { --bg: #f3f5f9; --surface: #fff; --bd: #d9e0ea; --tx: #0f1b2d; --mut: #44546a; --accent: #1c5cc8; --ok: #15803d; --warn: #a85a00; --crit: #b42318; --top: #0f2a52; }
+  :root { --bg: #f3f5f9; --surface: #fff; --bd: #d9e0ea; --tx: #0f1b2d; --mut: #44546a; --accent: #1c5cc8; --ok: #15803d; --warn: #a85a00; --crit: #b42318; --top: #131f36; --minas: #d32f2f; }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #0b1322; --surface: #131f36; --bd: #2a3b5c; --tx: #e9eefb; --mut: #a9b8d3; --accent: #6fa3ff; --ok: #4ade80; --warn: #fbbf5a; --crit: #ff8a80; --top: #0b1f3f; }
+    :root { --bg: #0b1322; --surface: #131f36; --bd: #2a3b5c; --tx: #e9eefb; --mut: #a9b8d3; --accent: #6fa3ff; --ok: #4ade80; --warn: #fbbf5a; --crit: #ff8a80; --top: #0f1a2e; }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--tx); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  header { background: var(--top); color: #fff; padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  header b { letter-spacing: .04em; }
+  /* mesmo topo do painel: azul-marinho do ícone, logo e a faixa vermelha de Minas (só na marca; vermelho na interface é erro) */
+  header { background: var(--top); color: #fff; padding: 8px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; box-shadow: inset 0 -3px 0 var(--minas); }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand div { display: flex; flex-direction: column; line-height: 1.15; }
+  .brand b { letter-spacing: .06em; font-size: 1rem; }
+  .brand span { font-size: .72rem; opacity: .85; letter-spacing: .04em; text-transform: uppercase; }
   header a { color: #fff; margin-left: auto; border: 1px solid rgb(255 255 255 / .35); border-radius: 8px; padding: 6px 12px; text-decoration: none; font-size: .84rem; }
   main { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
   section { background: var(--surface); border: 1px solid var(--bd); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
@@ -37,7 +42,7 @@
 </style>
 </head>
 <body>
-<header><b>SUPER PAINEL TJMG</b><span id="topo-comarca"></span><a href="painel.html">Abrir o painel</a></header>
+<header><div class="brand"><img src="../icones/super-painel.svg" width="32" height="32" alt=""><div><b>SUPER PAINEL</b><span id="topo-comarca"></span></div></div><a href="painel.html">Abrir o painel</a></header>
 <main>
   <h1>Coleta de dados</h1>
   <p class="meta">A extensão lê os painéis Qlik do TJMG direto deste navegador. Os números e as relações de processos ficam só aqui; nada é enviado a servidores.</p>

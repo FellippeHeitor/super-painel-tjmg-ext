@@ -21,10 +21,11 @@ function semDados(msg: string) {
   (document.getElementById('rodape') as HTMLElement).style.display = 'none';
   const caixa = document.createElement('div');
   caixa.className = 'vazio';
+  const logo = document.createElement('img'); logo.className = 'logo'; logo.src = '../icones/super-painel.svg'; logo.width = logo.height = 72; logo.alt = '';
   const h = document.createElement('h1'); h.textContent = 'Super Painel TJMG';
   const p = document.createElement('p'); p.textContent = msg;
   const a = document.createElement('a'); a.href = 'coleta.html'; a.textContent = 'Escolher a comarca e coletar os dados'; a.className = 'btn';
-  caixa.append(h, p, a);
+  caixa.append(logo, h, p, a);
   document.body.append(caixa);
 }
 

@@ -1,0 +1,6 @@
+<!-- Ícone grande (48 e 128 px): triângulo da bandeira de Minas, com a linha de crescimento saindo dele. Sem lema, brasão ou logo do TJMG. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="#fff" stroke="#d8deea" stroke-width="2"/>
+  <path d="M56 40 L96 106 H16 Z" fill="#d32f2f" stroke="#d32f2f" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M26 96 L40 80 L52 90 L102 30 M88 32 L102 30 L102 44" fill="none" stroke="#131f36" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

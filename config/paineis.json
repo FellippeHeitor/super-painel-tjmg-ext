@@ -1,0 +1,1011 @@
+{
+ "_nota": "Gerado a partir de config/paineis.yaml + config/kpis.yaml do robô super-painel-tjmg (04/10/2026). campoComarca = campo de comarca do app; o valor é resolvido em tempo de execução (src/comarca.js). Seletores de KPIs: ver o cabeçalho de config/kpis.yaml do robô. lista_por_campo: a tabela de processos do painel só aparece com 1 valor desse campo selecionado (condição de cálculo); a coleta percorre cada valor possível na comarca e junta as linhas.",
+ "paineis": {
+  "mov_mes_corrente": {
+   "id": "mov_mes_corrente",
+   "nome": "Movimentação processual - mês corrente (1ª instância)",
+   "appid": "4b327cf1-95c1-4a28-a9c7-d78b2f00bc9c",
+   "sheet": "5ff443e2-6808-4b86-a937-181c67587201",
+   "campoComarca": "Comarca",
+   "frequencia": "diaria",
+   "carimbo": {
+    "objeto": "text-image",
+    "medida_contem": "vReloadTime_OPEROSIDADE_GERAL"
+   },
+   "kpis": {
+    "entradas_mes": {
+     "medida": "Entradas"
+    },
+    "saidas_mes": {
+     "medida": "Saídas"
+    }
+   },
+   "series": {
+    "diario": {
+     "medida": "Diário",
+     "dimensao": "Cod_data"
+    }
+   }
+  },
+  "mov_eproc": {
+   "id": "mov_eproc",
+   "nome": "Movimentação processual EPROC diário",
+   "appid": "a08613b7-4f3b-43ea-8582-755e0e93081e",
+   "sheet": "9eb3b19a-9203-4eb8-97a4-561cc4e09f15",
+   "campoComarca": "Comarca_EPROC",
+   "frequencia": "diaria",
+   "carimbo": {
+    "objeto": "text-image",
+    "medida_contem": "vReloadTime_OPEROSIDADE_GERAL"
+   },
+   "kpis": {
+    "distribuicao_total": {
+     "objeto": "kpi",
+     "medida_contem": "={'Distribuição'}"
+    },
+    "baixa_total": {
+     "objeto": "kpi",
+     "medida_contem": "={'Baixa'}"
+    },
+    "julgamentos_total": {
+     "objeto": "kpi",
+     "medida_contem": "Julgamento com Mérito"
+    }
+   },
+   "series": {
+    "distribuicao_mes": {
+     "medida": "Distribuição",
+     "objeto": "linechart"
+    },
+    "baixas_mes": {
+     "medida": "Acervo",
+     "objeto": "linechart"
+    },
+    "julgamentos_mes": {
+     "medida": "Julgamentos",
+     "objeto": "linechart"
+    }
+   },
+   "cubos_serie": {
+    "acervo_por_classe": {
+     "dimensoes": [
+      "Classe_EPROC"
+     ],
+     "medidas": [
+      "Count({<[ACERVO]={'1'}>} DISTINCT [Processo_EPROC])"
+     ]
+    },
+    "migrados_mes": {
+     "dimensoes": [
+      "Mês/Ano Métrica_EPROC"
+     ],
+     "medidas": [
+      "Count({<[Métrica_EPROC]={'Migrado'}>} DISTINCT [Processo_EPROC])"
+     ]
+    },
+    "migrados_mes_no_acervo": {
+     "dimensoes": [
+      "Mês/Ano Métrica_EPROC"
+     ],
+     "medidas": [
+      "Count({<[ACERVO]={'1'},[Métrica_EPROC]={'Migrado'}>} DISTINCT [Processo_EPROC])"
+     ]
+    }
+   },
+   "cubos_valor": {
+    "acervo": {
+     "medidas": [
+      "Count({<[ACERVO]={'1'}>} DISTINCT [Processo_EPROC])"
+     ]
+    },
+    "migrados": {
+     "medidas": [
+      "Count({<[Métrica_EPROC]={'Migrado'}>} [Métrica_EPROC])"
+     ]
+    }
+   }
+  },
+  "docs_nao_lidos": {
+   "id": "docs_nao_lidos",
+   "nome": "Documentos juntados e não lidos",
+   "appid": "fa08262d-099f-42d1-b6e5-d435715836d1",
+   "sheet": "dbd5d134-892e-498a-a72d-fa20edfa10a9",
+   "campoComarca": "Comarca",
+   "frequencia": "diaria",
+   "carimbo": {
+    "objeto": "text-image",
+    "medida_contem": "vReloadTime"
+   },
+   "exporta_tabela_spec": {
+    "objeto": "table",
+    "titulo_contem": "Relação de processos"
+   },
+   "kpis": {
+    "total_documentos": {
+     "medida": "Total de documentos"
+    }
+   },
+   "series": {
+    "por_classe": {
+     "medida": "Processos",
+     "dimensao": "Classe"
+    },
+    "por_assunto": {
+     "medida": "Processos",
+     "dimensao_contem": "Assunto"
+    },
+    "por_documento": {
+     "medida": "Processos",
+     "dimensao": "Documento",
+     "objeto": "treemap"
+    }
+   },
+   "exporta_tabela": "Relação de processos",
+   "lista_por_campo": "Órgão Julgador"
+  },
+  "tarefas_pje_diario": {
+   "id": "tarefas_pje_diario",
+   "nome": "Tarefas pendentes no PJe (diário)",
+   "appid": "3d35ff28-8f31-4bf7-bc4c-63e82d09e18f",
+   "sheet": "e854b416-f7cf-4463-9cce-8c66afc5433c",
+   "campoComarca": "Comarca",
+   "frequencia": "diaria",
+   "carimbo": {
+    "expressao": "=vReloadTime"
+   },
+   "exporta_tabela_spec": {
+    "sheet": "6a8e502b-2112-438c-904d-e8cb7ba428ac",
+    "objeto": "table",
+    "titulo_contem": "Relação de Processos"
+   },
+   "kpis": {
+    "tarefas_pendentes": {
+     "medida": "Tarefas"
+    }
+   },
+   "series": {
+    "tarefas": {
+     "medida": "Tarefas",
+     "dimensao": "Tarefa"
+    },
+    "processos_por_classe": {
+     "medida": "Processos",
+     "dimensao_contem": "Classe"
+    },
+    "processos_por_assunto": {
+     "medida": "Processos",
+     "dimensao_contem": "Assunto"
+    },
+    "faixa_tempo": {
+     "medida": "Count(Distinct Processo)",
+     "objeto": "barchart"
+    }
+   },
+   "exporta_tabela": "Detalhamento por Processo",
+   "lista_por_campo": "Órgão Julgador"
+  },
+  "tarefas_pje_semanal": {
+   "id": "tarefas_pje_semanal",
+   "nome": "Tarefas pendentes no PJe (semanal)",
+   "appid": "494feef3-8770-47ad-bc57-c98daaaf1b22",
+   "sheet": "pbwqUgU",
+   "campoComarca": "COMARCA",
+   "frequencia": "semanal",
+   "filtros_dinamicos": [
+    {
+     "campo": "COD_TEMPO"
+    }
+   ],
+   "exporta_tabela_spec": {
+    "objeto": "table",
+    "titulo_contem": "Lista de Processos"
+   },
+   "carimbo": {
+    "expressao": "Timestamp(ReloadTime(),'DD/MM/YYYY hh:mm:ss')"
+   },
+   "kpis": {
+    "total_tarefas": {
+     "medida": "Total",
+     "titulo_contem": "Total de tarefas pendentes"
+    }
+   },
+   "series": {
+    "por_tipo_tarefa": {
+     "medida": "Total",
+     "titulo_contem": "Total de tarefas pendentes"
+    }
+   },
+   "exporta_tabela": "Lista de Processos"
+  },
+  "dados_estrategicos": {
+   "id": "dados_estrategicos",
+   "nome": "Dados estratégicos das unidades judiciárias",
+   "appid": "4a19b4e4-1900-4ed0-9443-238ea3c472fe",
+   "sheet": "bafb066f-c20c-4e97-b358-4a5fc17eb682",
+   "campoComarca": "Comarca",
+   "frequencia": "mensal_dia15",
+   "variantes": [
+    {
+     "id": "pje",
+     "selecoes": [
+      [
+       "Origem dos Dados",
+       [
+        "PJe"
+       ]
+      ]
+     ]
+    },
+    {
+     "id": "seeu",
+     "selecoes": [
+      [
+       "Origem dos Dados",
+       [
+        "SEEU"
+       ]
+      ]
+     ]
+    },
+    {
+     "id": "siscom",
+     "selecoes": [
+      [
+       "Origem dos Dados",
+       [
+        "SISCOM"
+       ]
+      ]
+     ]
+    }
+   ],
+   "carimbo": {
+    "objeto": "text-image",
+    "medida_contem": "Data_Carga_Fato"
+   },
+   "kpis": {
+    "julgamentos": {
+     "medida": "Total de Julgamentos"
+    },
+    "distribuidos": {
+     "medida_contem": "Total de Feitos Distrib"
+    },
+    "baixas_1a": {
+     "medida_contem": "Total de Baixas"
+    },
+    "acervo_final": {
+     "medida_contem": "Acervo de Feitos Ativos"
+    },
+    "paralisados_60": {
+     "medida_contem": "Paralisados >60"
+    },
+    "paralisados_100": {
+     "medida_contem": "Paralisados >100"
+    },
+    "paralisados_120": {
+     "medida_contem": "Paralisados >120"
+    },
+    "indice_baixas": {
+     "medida_contem": "dice de Baixas"
+    },
+    "indice_julgamentos": {
+     "medida_contem": "dice de Julgamentos"
+    }
+   },
+   "series": {
+    "julgamentos_mes": {
+     "medida": "Julgamentos",
+     "objeto": "linechart",
+     "dimensao": "Data"
+    },
+    "baixas_mes": {
+     "medida": "Baixas",
+     "objeto": "linechart"
+    },
+    "distribuidos_mes": {
+     "medida": "Feitos Distribuídos",
+     "objeto": "linechart"
+    },
+    "acervo_mes": {
+     "medida": "Acervo",
+     "objeto": "linechart"
+    }
+   }
+  },
+  "acervo_fisico": {
+   "id": "acervo_fisico",
+   "nome": "Acervo de processos físicos na 1ª instância",
+   "appid": "60b5cfd6-0f45-4e54-9d43-3ade9403151b",
+   "sheet": "a567a891-bffa-459e-aa29-a6beb1f0d02c",
+   "campoComarca": "Comarca",
+   "frequencia": "diaria",
+   "carimbo": {
+    "objeto": "sn-text",
+    "medida": "Atualizado em"
+   },
+   "kpis": {
+    "total_processos": {
+     "medida": "Total de Processos"
+    }
+   },
+   "series": {
+    "por_classe": {
+     "medida": "Acervo",
+     "dimensao": "Classe"
+    }
+   }
+  },
+  "migrador_pje": {
+   "id": "migrador_pje",
+   "nome": "Migrador de processos PJe",
+   "appid": "846fb312-f51f-4c73-878f-44ece049f9a9",
+   "sheet": "ccvzvMe",
+   "campoComarca": "COMARCA",
+   "frequencia": "diaria",
+   "carimbo": {
+    "medida_contem": "Atualiza",
+    "objeto": "kpi"
+   },
+   "kpis": {
+    "aptos": {
+     "medida": "Quantidade de Processo(s) Apto(s)"
+    },
+    "inaptos": {
+     "medida": "Quantidade de Processo(s) Inapto(s)"
+    },
+    "migrados": {
+     "medida": "Quantidade de Processo(s) Migrados(s)"
+    },
+    "total_processos": {
+     "medida": "Total de Processos"
+    }
+   },
+   "series": {
+    "aptos_por_unidade": {
+     "medida": "Quantidade de Processo(s) Apto(s)"
+    },
+    "inaptos_por_orgao": {
+     "medida": "Quantidade de Processo(s) Inapto(s)"
+    },
+    "migrados_por_orgao": {
+     "medida": "Quantidade de Processo(s) Migrados(s)"
+    }
+   }
+  },
+  "apoio_planejamento": {
+   "id": "apoio_planejamento",
+   "nome": "Apoio ao planejamento e fiscalização",
+   "appid": "2c170c7e-dbf1-4f5e-acfa-97c4528502c2",
+   "sheet": "c6a74be1-3804-4898-843d-2b4341fa0c0d",
+   "campoComarca": "COMARCA",
+   "frequencia": "mensal_dia15",
+   "filtros_dinamicos": [
+    {
+     "campo": "ANO_12_MESES"
+    },
+    {
+     "campo": "MES_12_MESES"
+    }
+   ],
+   "carimbo": {
+    "objeto": "text-image",
+    "medida_contem": "ltima carga"
+   },
+   "series": {
+    "indicadores_mes": {
+     "sheet": "3d866a50-b6dd-4164-b32e-b735b0a9a954",
+     "objeto": "table",
+     "titulo_contem": "Indicadores Gerais",
+     "medida_contem": "mês selecionado"
+    },
+    "indicadores_6m": {
+     "sheet": "3d866a50-b6dd-4164-b32e-b735b0a9a954",
+     "objeto": "table",
+     "titulo_contem": "Indicadores Gerais",
+     "medida_contem": "06 meses"
+    },
+    "indicadores_media_mensal": {
+     "sheet": "3d866a50-b6dd-4164-b32e-b735b0a9a954",
+     "objeto": "table",
+     "titulo_contem": "Indicadores Gerais",
+     "medida_contem": "Média Mensal"
+    }
+   }
+  },
+  "conclusoes_pje": {
+   "id": "conclusoes_pje",
+   "nome": "Conclusões realizadas (PJe)",
+   "appid": "3149e324-35b6-4d15-8406-2359be35febd",
+   "sheet": "1cf4ab46-54c9-4276-be3d-030d46c1a5bc",
+   "campoComarca": "Comarca",
+   "frequencia": "diaria",
+   "carimbo": {
+    "medida": "Data de referência:"
+   },
+   "kpis": {
+    "data_referencia": {
+     "medida": "Data de referência:"
+    }
+   },
+   "exporta_tabela": "Listagem de Processo"
+  },
+  "metas_cnj": {
+   "id": "metas_cnj",
+   "nome": "Metas Nacionais do Poder Judiciário - 1º Grau",
+   "appid": "9e11bee1-de24-4b68-bcc4-05741d2bcbe8",
+   "sheet": "81b26e87-da0d-4dec-b37e-44c57aa7f196",
+   "sheets_metas": {
+    "1": "81b26e87-da0d-4dec-b37e-44c57aa7f196",
+    "2": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+    "3": "c6693406-5370-4e9d-8aed-4ea3a90a7b47",
+    "4": "274642ec-4c17-486c-ba5d-23c48397b1f3",
+    "5": "dd5f03b5-2a7e-4dcb-bb05-a0d1c285aa1f",
+    "6": "94e908f1-a384-463d-a98e-3c6b2ccc514e",
+    "7": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+    "8": "836a4f50-8485-43a5-bbba-2025b99212cd",
+    "10": "ce7473ac-dac1-48cf-9af0-70d87144b501"
+   },
+   "campoComarca": "COMARCA",
+   "frequencia": "mensal",
+   "carimbo": {
+    "expressao": "Date(Max(MES_REF),'DD/MM/YYYY')"
+   },
+   "exporta_tabela_spec": {
+    "sheet": "QuMbuX",
+    "objeto": "table",
+    "titulo_contem": "PENDENTE"
+   },
+   "kpis": {
+    "m1_cumprimento": {
+     "sheet": "81b26e87-da0d-4dec-b37e-44c57aa7f196",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento"
+    },
+    "m3_cumprimento": {
+     "sheet": "c6693406-5370-4e9d-8aed-4ea3a90a7b47",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento"
+    },
+    "m5_cumprimento": {
+     "sheet": "dd5f03b5-2a7e-4dcb-bb05-a0d1c285aa1f",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento"
+    },
+    "m6_cumprimento": {
+     "sheet": "94e908f1-a384-463d-a98e-3c6b2ccc514e",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento"
+    },
+    "m10_cumprimento": {
+     "sheet": "ce7473ac-dac1-48cf-9af0-70d87144b501",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento"
+    },
+    "m2s0_cumprimento": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento",
+     "variaveis": {
+      "vTipoMeta2": 0
+     }
+    },
+    "m2s1_cumprimento": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento",
+     "variaveis": {
+      "vTipoMeta2": 1
+     }
+    },
+    "m2s2_cumprimento": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento",
+     "variaveis": {
+      "vTipoMeta2": 2
+     }
+    },
+    "m4s0_cumprimento": {
+     "sheet": "274642ec-4c17-486c-ba5d-23c48397b1f3",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento",
+     "variaveis": {
+      "vTipoMeta4": 0
+     }
+    },
+    "m4s1_cumprimento": {
+     "sheet": "274642ec-4c17-486c-ba5d-23c48397b1f3",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento",
+     "variaveis": {
+      "vTipoMeta4": 1
+     }
+    },
+    "m7s0_cumprimento": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento",
+     "variaveis": {
+      "vTipoMeta7": 0
+     }
+    },
+    "m7s1_cumprimento": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento",
+     "variaveis": {
+      "vTipoMeta7": 1
+     }
+    },
+    "m7s2_cumprimento": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento",
+     "variaveis": {
+      "vTipoMeta7": 2
+     }
+    },
+    "m8s0_cumprimento": {
+     "sheet": "836a4f50-8485-43a5-bbba-2025b99212cd",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento",
+     "variaveis": {
+      "vTipoMeta8": 0
+     }
+    },
+    "m8s1_cumprimento": {
+     "sheet": "836a4f50-8485-43a5-bbba-2025b99212cd",
+     "objeto": "qsSimpleKPI",
+     "medida_contem": "Cumprimento",
+     "variaveis": {
+      "vTipoMeta8": 1
+     }
+    }
+   },
+   "series": {
+    "m1_evolucao": {
+     "sheet": "81b26e87-da0d-4dec-b37e-44c57aa7f196",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu"
+    },
+    "m1_varas": {
+     "sheet": "81b26e87-da0d-4dec-b37e-44c57aa7f196",
+     "objeto": "barchart",
+     "max_linhas": 60
+    },
+    "m3_evolucao": {
+     "sheet": "c6693406-5370-4e9d-8aed-4ea3a90a7b47",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu"
+    },
+    "m3_varas": {
+     "sheet": "c6693406-5370-4e9d-8aed-4ea3a90a7b47",
+     "objeto": "barchart",
+     "max_linhas": 60
+    },
+    "m5_evolucao": {
+     "sheet": "dd5f03b5-2a7e-4dcb-bb05-a0d1c285aa1f",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu"
+    },
+    "m5_varas": {
+     "sheet": "dd5f03b5-2a7e-4dcb-bb05-a0d1c285aa1f",
+     "objeto": "barchart",
+     "max_linhas": 60
+    },
+    "m6_evolucao": {
+     "sheet": "94e908f1-a384-463d-a98e-3c6b2ccc514e",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu"
+    },
+    "m6_varas": {
+     "sheet": "94e908f1-a384-463d-a98e-3c6b2ccc514e",
+     "objeto": "barchart",
+     "max_linhas": 60
+    },
+    "m10_evolucao": {
+     "sheet": "ce7473ac-dac1-48cf-9af0-70d87144b501",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu"
+    },
+    "m10_varas": {
+     "sheet": "ce7473ac-dac1-48cf-9af0-70d87144b501",
+     "objeto": "barchart",
+     "max_linhas": 60
+    },
+    "m2s0_evolucao": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu",
+     "variaveis": {
+      "vTipoMeta2": 0
+     },
+     "opcional": true
+    },
+    "m2s0_varas": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "objeto": "barchart",
+     "max_linhas": 60,
+     "variaveis": {
+      "vTipoMeta2": 0
+     },
+     "opcional": true
+    },
+    "m2s1_evolucao": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu",
+     "variaveis": {
+      "vTipoMeta2": 1
+     },
+     "opcional": true
+    },
+    "m2s1_varas": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "objeto": "barchart",
+     "max_linhas": 60,
+     "variaveis": {
+      "vTipoMeta2": 1
+     },
+     "opcional": true
+    },
+    "m2s2_evolucao": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu",
+     "variaveis": {
+      "vTipoMeta2": 2
+     },
+     "opcional": true
+    },
+    "m2s2_varas": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "objeto": "barchart",
+     "max_linhas": 60,
+     "variaveis": {
+      "vTipoMeta2": 2
+     },
+     "opcional": true
+    },
+    "m4s0_evolucao": {
+     "sheet": "274642ec-4c17-486c-ba5d-23c48397b1f3",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu",
+     "variaveis": {
+      "vTipoMeta4": 0
+     },
+     "opcional": true
+    },
+    "m4s0_varas": {
+     "sheet": "274642ec-4c17-486c-ba5d-23c48397b1f3",
+     "objeto": "barchart",
+     "max_linhas": 60,
+     "variaveis": {
+      "vTipoMeta4": 0
+     },
+     "opcional": true
+    },
+    "m4s1_evolucao": {
+     "sheet": "274642ec-4c17-486c-ba5d-23c48397b1f3",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu",
+     "variaveis": {
+      "vTipoMeta4": 1
+     },
+     "opcional": true
+    },
+    "m4s1_varas": {
+     "sheet": "274642ec-4c17-486c-ba5d-23c48397b1f3",
+     "objeto": "barchart",
+     "max_linhas": 60,
+     "variaveis": {
+      "vTipoMeta4": 1
+     },
+     "opcional": true
+    },
+    "m7s0_evolucao": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu",
+     "variaveis": {
+      "vTipoMeta7": 0
+     },
+     "opcional": true
+    },
+    "m7s0_varas": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "objeto": "barchart",
+     "max_linhas": 60,
+     "variaveis": {
+      "vTipoMeta7": 0
+     },
+     "opcional": true
+    },
+    "m7s1_evolucao": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu",
+     "variaveis": {
+      "vTipoMeta7": 1
+     },
+     "opcional": true
+    },
+    "m7s1_varas": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "objeto": "barchart",
+     "max_linhas": 60,
+     "variaveis": {
+      "vTipoMeta7": 1
+     },
+     "opcional": true
+    },
+    "m7s2_evolucao": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu",
+     "variaveis": {
+      "vTipoMeta7": 2
+     },
+     "opcional": true
+    },
+    "m7s2_varas": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "objeto": "barchart",
+     "max_linhas": 60,
+     "variaveis": {
+      "vTipoMeta7": 2
+     },
+     "opcional": true
+    },
+    "m8s0_evolucao": {
+     "sheet": "836a4f50-8485-43a5-bbba-2025b99212cd",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu",
+     "variaveis": {
+      "vTipoMeta8": 0
+     },
+     "opcional": true
+    },
+    "m8s0_varas": {
+     "sheet": "836a4f50-8485-43a5-bbba-2025b99212cd",
+     "objeto": "barchart",
+     "max_linhas": 60,
+     "variaveis": {
+      "vTipoMeta8": 0
+     },
+     "opcional": true
+    },
+    "m8s1_evolucao": {
+     "sheet": "836a4f50-8485-43a5-bbba-2025b99212cd",
+     "objeto": "linechart",
+     "titulo_contem": "Evolu",
+     "variaveis": {
+      "vTipoMeta8": 1
+     },
+     "opcional": true
+    },
+    "m8s1_varas": {
+     "sheet": "836a4f50-8485-43a5-bbba-2025b99212cd",
+     "objeto": "barchart",
+     "max_linhas": 60,
+     "variaveis": {
+      "vTipoMeta8": 1
+     },
+     "opcional": true
+    }
+   },
+   "textos": {
+    "m1_descricao": {
+     "sheet": "81b26e87-da0d-4dec-b37e-44c57aa7f196",
+     "objeto": "text-image",
+     "contem": "Julgar quantidade"
+    },
+    "m2_descricao": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "objeto": "text-image",
+     "contem": "pelo menos"
+    },
+    "m3_descricao": {
+     "sheet": "c6693406-5370-4e9d-8aed-4ea3a90a7b47",
+     "objeto": "text-image",
+     "contem": "Aumentar o indicador"
+    },
+    "m4_descricao": {
+     "sheet": "274642ec-4c17-486c-ba5d-23c48397b1f3",
+     "objeto": "text-image",
+     "contem": "Administra"
+    },
+    "m5_descricao": {
+     "sheet": "dd5f03b5-2a7e-4dcb-bb05-a0d1c285aa1f",
+     "objeto": "text-image",
+     "contem": "Reduzir em"
+    },
+    "m6_descricao": {
+     "sheet": "94e908f1-a384-463d-a98e-3c6b2ccc514e",
+     "objeto": "text-image",
+     "contem": "ambientais"
+    },
+    "m7_descricao": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "objeto": "text-image",
+     "contem": "quilombolas"
+    },
+    "m8_descricao": {
+     "sheet": "836a4f50-8485-43a5-bbba-2025b99212cd",
+     "objeto": "text-image",
+     "contem": "feminic"
+    },
+    "m10_descricao": {
+     "sheet": "ce7473ac-dac1-48cf-9af0-70d87144b501",
+     "objeto": "text-image",
+     "contem": "Inf"
+    }
+   },
+   "cubos_valor": {
+    "m1_j": {
+     "medidas": [
+      "Sum({<META={\"Meta 1\"}>}JULGADO)"
+     ]
+    },
+    "m1_d": {
+     "medidas": [
+      "Sum({<META={\"Meta 1\"}>}DISTRIBUIDO)"
+     ]
+    },
+    "m1_dess": {
+     "medidas": [
+      "Sum({<META={\"Meta 1\"}>}DESSOBRESTADO)"
+     ]
+    },
+    "m1_s": {
+     "medidas": [
+      "Sum({<META={\"Meta 1\"}>}SUSPENSO)"
+     ]
+    },
+    "m6_j": {
+     "medidas": [
+      "Sum({<META={\"Meta 6\"}>}JULGADO) + Sum({<META={\"Meta 6\"}, MES_REF={'$(=max(MES_REF))'}>}JULGADO_ANT)"
+     ]
+    },
+    "m6_d": {
+     "medidas": [
+      "Sum({<META={\"Meta 6\"}>}DISTRIBUIDO) + Sum({<META={\"Meta 6\"}, MES_REF={'$(=max(MES_REF))'}>}DISTRIBUIDO_ANT)"
+     ]
+    },
+    "m6_dess": {
+     "medidas": [
+      "Sum({<META={\"Meta 6\"}>}DESSOBRESTADO) + Sum({<META={\"Meta 6\"}, MES_REF={'$(=max(MES_REF))'}>}DESSOBRESTADO_ANT)"
+     ]
+    },
+    "m6_s": {
+     "medidas": [
+      "Sum({<META={\"Meta 6\"}>}SUSPENSO) + Sum({<META={\"Meta 6\"}, MES_REF={'$(=max(MES_REF))'}>}SUSPENSO_ANT)"
+     ]
+    },
+    "m10_j": {
+     "medidas": [
+      "Sum({<META={\"Meta 10\"}>}JULGADO) + Sum({<META={\"Meta 10\"}, MES_REF={'$(=max(MES_REF))'}>}JULGADO_ANT)"
+     ]
+    },
+    "m10_d": {
+     "medidas": [
+      "Sum({<META={\"Meta 10\"}>}DISTRIBUIDO) + Sum({<META={\"Meta 10\"}, MES_REF={'$(=max(MES_REF))'}>}DISTRIBUIDO_ANT)"
+     ]
+    },
+    "m10_dess": {
+     "medidas": [
+      "Sum({<META={\"Meta 10\"}>}DESSOBRESTADO) + Sum({<META={\"Meta 10\"}, MES_REF={'$(=max(MES_REF))'}>}DESSOBRESTADO_ANT)"
+     ]
+    },
+    "m10_s": {
+     "medidas": [
+      "Sum({<META={\"Meta 10\"}>}SUSPENSO) + Sum({<META={\"Meta 10\"}, MES_REF={'$(=max(MES_REF))'}>}SUSPENSO_ANT)"
+     ]
+    },
+    "m3_conc": {
+     "medidas": [
+      "Sum({<ANO={\"2026\"}>}CONC)"
+     ]
+    },
+    "m3_sent": {
+     "medidas": [
+      "Sum({<ANO={\"2026\"}>}SENTNC)"
+     ]
+    },
+    "m3_conc_ant": {
+     "medidas": [
+      "Sum(CONC_ANT)"
+     ]
+    },
+    "m3_sent_ant": {
+     "medidas": [
+      "Sum(SENTNC_ANT)"
+     ]
+    },
+    "m5_cpl": {
+     "medidas": [
+      "Sum({<MES_REF={\"$(maximo_meta5)\"}>} QTDE_INDIC_CPL)"
+     ]
+    },
+    "m5_bx": {
+     "medidas": [
+      "Sum({<MES_REF={\"$(maximo_meta5)\"}>} QTDE_INDIC_BX_CUM)"
+     ]
+    },
+    "m5_cpl_ant": {
+     "medidas": [
+      "Sum({<MES_REF={\"$(maximo_meta5)\"}>} QTDE_INDIC_CPL_ANT)"
+     ]
+    },
+    "m5_bx_ant": {
+     "medidas": [
+      "Sum({<MES_REF={\"$(maximo_meta5)\"}>} QTDE_INDIC_BX_ANT)"
+     ]
+    }
+   },
+   "exprs": {
+    "m2s0_comp": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "variaveis": {
+      "vTipoMeta2": 0
+     }
+    },
+    "m2s1_comp": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "variaveis": {
+      "vTipoMeta2": 1
+     }
+    },
+    "m2s2_comp": {
+     "sheet": "f219cb6f-e41c-4df1-9744-7964cfc3e91a",
+     "variaveis": {
+      "vTipoMeta2": 2
+     }
+    },
+    "m4s0_comp": {
+     "sheet": "274642ec-4c17-486c-ba5d-23c48397b1f3",
+     "variaveis": {
+      "vTipoMeta4": 0
+     }
+    },
+    "m4s1_comp": {
+     "sheet": "274642ec-4c17-486c-ba5d-23c48397b1f3",
+     "variaveis": {
+      "vTipoMeta4": 1
+     }
+    },
+    "m7s0_comp": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "variaveis": {
+      "vTipoMeta7": 0
+     }
+    },
+    "m7s1_comp": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "variaveis": {
+      "vTipoMeta7": 1
+     }
+    },
+    "m7s2_comp": {
+     "sheet": "96d05e02-9e8b-44aa-a0cd-83acb65cb33d",
+     "variaveis": {
+      "vTipoMeta7": 2
+     }
+    },
+    "m8s0_comp": {
+     "sheet": "836a4f50-8485-43a5-bbba-2025b99212cd",
+     "variaveis": {
+      "vTipoMeta8": 0
+     }
+    },
+    "m8s1_comp": {
+     "sheet": "836a4f50-8485-43a5-bbba-2025b99212cd",
+     "variaveis": {
+      "vTipoMeta8": 1
+     }
+    }
+   },
+   "exporta_tabela": "Listagem de Pendentes"
+  }
+ }
+}

@@ -40,5 +40,5 @@ Sucessor do robô em Python/Playwright do Super Painel TJMG, que exigia um PC de
 
 ## Créditos
 
-- **Bernardo Vieira**: criador do Super Painel TJMG. A ideia, o robô original de coleta, o mapeamento dos painéis Qlik (campos, indicadores e expressões) e o painel web que esta extensão reaproveita.
+- **[Bernardo Vieira](https://github.com/bernardovieira1-droid)**: criador do Super Painel TJMG. A ideia, o robô original de coleta, o mapeamento dos painéis Qlik (campos, indicadores e expressões) e o painel web que esta extensão reaproveita.
 - **Fellippe Heitor**: extensão do Chrome, que leva esse trabalho para dentro do navegador e o torna utilizável por qualquer comarca.

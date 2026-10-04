@@ -26,8 +26,9 @@ function montarNav(){
     if (g) nav.append(el('h2', {}, g));
     for (const id of grupos[g]) { const v = VIEWS[id]; nav.append(el('a', {href: '#' + id, 'data-id': id}, ico(v.icone, 18), v.titulo)); }
   }
-  const modo = el('div', {class: 'modo'}, el('p', {id: 'modo-t'}, 'MODO'), el('div', {class: 'seg', role: 'group', 'aria-labelledby': 'modo-t'},
-    ...[['gerencial', 'Gerencial'], ['detalhado', 'Detalhado']].map(([k, r]) => { const b = el('button', {type: 'button', 'data-modo': k}, r); b.addEventListener('click', () => definirModo(k)); return b; })),
+  // seletor de modo num invólucro próprio: só aparece nas visões que têm blocos .detalhe (ver rota())
+  const modo = el('div', {class: 'modo'}, el('div', {id: 'modo-sel'}, el('p', {id: 'modo-t'}, 'MODO'), el('div', {class: 'seg', role: 'group', 'aria-labelledby': 'modo-t'},
+    ...[['gerencial', 'Gerencial'], ['detalhado', 'Detalhado']].map(([k, r]) => { const b = el('button', {type: 'button', 'data-modo': k}, r); b.addEventListener('click', () => definirModo(k)); return b; }))),
     el('button', {class: 'btn-lado', type: 'button', id: 'imprimir'}, 'Imprimir tudo'));
   nav.append(modo);
   nav.addEventListener('click', (ev) => { if (ev.target.closest('a')) fecharMenu(); });
@@ -52,6 +53,7 @@ function rota(){
   const id = VIEWS[bruto] ? bruto : (ALIAS[bruto] || 'visao');
   const caixa = construir(id);
   for (const c of document.querySelectorAll('.view')) c.hidden = c !== caixa;
+  document.getElementById('modo-sel').hidden = !caixa.querySelector('.detalhe');   // o modo só muda algo onde há blocos .detalhe
   document.querySelectorAll('#side a').forEach(a => { if (a.dataset.id === id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   document.title = `${VIEWS[id].titulo} · ${D.titulo}`;
   if (id === 'processos' && window.__procAplicar && atualId === 'processos') window.__procAplicar(params);

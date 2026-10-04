@@ -10,9 +10,11 @@ Decisões (04/10/2026):
 - Grafia da comarca resolvida por app (sem acento/maiúsculas, exatamente 1 equivalente), com cache em chrome.storage.local (`grafia|COMARCA|appid|campo`); se a seleção não pegar, resolve de novo uma vez.
 - O Qlik do TJMG é acessível fora da Rede TJMG (confirmado pelo usuário e em teste automatizado).
 
-Mecanismo: `src/gancho-ws.js` (content script, world MAIN, document_start) anota a URL do WebSocket da Engine; `src/qlik.js` mantém UMA aba de trabalho em segundo plano e executa `src/engine.js` nela via `chrome.scripting.executeScript({world: 'MAIN'})`. `engine.js` é serializado pelo Chrome: não pode depender de nada fora da função. A rotina roda numa página da extensão (`pages/coleta.html`, `?auto=1` quando disparada pelo alarme), não no service worker (limite de vida do SW).
+Código em TypeScript (`tsc`, sem bundler): `npm run build` gera os `.js` ao lado dos `.ts` (ignorados no git) e a própria pasta do repositório é carregada no Chrome (não mudar: outra pasta = outro ID de extensão = perde o IndexedDB); `npm run check` só verifica tipos. Tipos compartilhados em `src/tipos.ts`. Os templates `pages/painel/0*-90*.js` continuam em JS e versionados.
 
-Front-end: `pages/painel/*.js` são os templates do site antigo com mudanças mínimas (`D`/`P` vêm de `window.__D`/`__P`, montados por `carregar.js` com `src/dados.js`; textos sem "Minas Novas"/"mar/2026" fixos; `M.eproc_inicio` = 1º mês com distribuição no eProc). Sem script inline (CSP do MV3).
+Mecanismo: `src/gancho-ws.ts` (content script, world MAIN, document_start) anota a URL do WebSocket da Engine; `src/qlik.ts` mantém UMA aba de trabalho em segundo plano e executa `src/engine.ts` nela via `chrome.scripting.executeScript({world: 'MAIN'})`. `engine.ts` é serializado pelo Chrome: não pode depender de nada fora da função (só `import type`). A rotina roda numa página da extensão (`pages/coleta.html`, `?auto=1` quando disparada pelo alarme), não no service worker (limite de vida do SW).
+
+Front-end: `pages/painel/*.js` são os templates do site antigo com mudanças mínimas (`D`/`P` vêm de `window.__D`/`__P`, montados por `carregar.ts` com `src/dados.ts`; textos sem "Minas Novas"/"mar/2026" fixos; `M.eproc_inicio` = 1º mês com distribuição no eProc). Sem script inline (CSP do MV3).
 
 Teste automatizado: Playwright em cache (`~/.npm/_npx/.../playwright-core` 1.61) + Chrome for Testing 1228, `--load-extension`, headless. Harness no scratchpad da sessão (não versionado).
 

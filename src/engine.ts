@@ -1,16 +1,23 @@
 // Executa um "job" na Engine API do Qlik DENTRO da aba do qlik.tjmg.jus.br (WebSocket próprio, só leitura).
-// Portado de super-painel-tjmg/app/engine.js. Chamado por src/qlik.js via chrome.scripting.executeScript({world: 'MAIN'}).
-// A função é serializada pelo Chrome: não pode usar nada de fora dela (imports, variáveis do módulo).
+// Portado de super-painel-tjmg/app/engine.js. Chamado por src/qlik.ts via chrome.scripting.executeScript({world: 'MAIN'}).
+// A função é serializada pelo Chrome: não pode usar nada de fora dela (imports, variáveis do módulo). Só `import type`.
 // job = {sheet, selecoes:[[campo,valor,estado?]], dinamicos:[{campo,tipo:'ultimo'}],
 //        itens:[{nome, tipo:'valor'|'serie'|'cubo'|'tabela'|'prop'|'exprs'|'campo', ...}], timeout_ms?}
 // Resultado: {selecoes:[{campo,valor,ok}], itens:{nome: resultado | {erro}}} ou {erro}
-export const engine = ([wsurl, job]) => new Promise((res) => {
+import type { Celula, ItemJob, Job, ResultadoItem, ResultadoJob, ResultadoOk } from './tipos.js';
+
+// Respostas JSON-RPC da Engine: estrutura do Qlik, não tipada aqui.
+type Qlik = any;
+interface Objeto { id: string; tipo: string; h: number; L: Qlik; hc: Qlik; titulo: string; dims: string[]; meds: string[] }
+interface Cubo { colunas: string[]; nd: number; total: number; linhas: Qlik[][] }
+
+export const engine = ([wsurl, job]: [string, Job]) => new Promise<ResultadoJob>((res) => {
   let feito = false, id = 0;
-  const p = {};
-  const fim = (r) => { if (!feito) { feito = true; clearTimeout(lim); try { ws.close(); } catch (e) {} res(r); } };
+  const p: Record<number, (d: Qlik) => void> = {};
+  const fim = (r: ResultadoJob) => { if (!feito) { feito = true; clearTimeout(lim); try { ws.close(); } catch (e) {} res(r); } };
   const lim = setTimeout(() => fim({erro: 'timeout'}), job.timeout_ms || 240000);
   const ws = new WebSocket(wsurl);
-  const call = (h, m, pr) => new Promise((r) => {
+  const call = (h: number, m: string, pr: unknown[]) => new Promise<Qlik>((r) => {
     const i = ++id; p[i] = r;
     ws.send(JSON.stringify({jsonrpc: '2.0', id: i, handle: h, method: m, params: pr}));
   });
@@ -18,20 +25,20 @@ export const engine = ([wsurl, job]) => new Promise((res) => {
   ws.onerror = () => fim({erro: 'ws_erro'});
   ws.onclose = () => fim({erro: 'ws_fechado'});
 
-  const num = (c) => (c && typeof c.qNum === 'number' && isFinite(c.qNum)) ? c.qNum : null;
-  const cel = (c) => ({txt: c ? c.qText : null, num: num(c)});
-  let H; const varAtual = {};
-  const layout = async (h) => { const l = await call(h, 'GetLayout', []); if (!l.result) throw new Error('GetLayout: ' + JSON.stringify(l.error)); return l.result.qLayout; };
-  const sessao = async (def) => { const o = await call(H, 'CreateSessionObject', [def]); if (!o.result) throw new Error('CreateSessionObject: ' + JSON.stringify(o.error)); return o.result.qReturn.qHandle; };
+  const num = (c: Qlik): number | null => (c && typeof c.qNum === 'number' && isFinite(c.qNum)) ? c.qNum : null;
+  const cel = (c: Qlik): Celula => ({txt: c ? c.qText : null, num: num(c)});
+  let H: number; const varAtual: Record<string, number> = {};
+  const layout = async (h: number): Promise<Qlik> => { const l = await call(h, 'GetLayout', []); if (!l.result) throw new Error('GetLayout: ' + JSON.stringify(l.error)); return l.result.qLayout; };
+  const sessao = async (def: Qlik): Promise<number> => { const o = await call(H, 'CreateSessionObject', [def]); if (!o.result) throw new Error('CreateSessionObject: ' + JSON.stringify(o.error)); return o.result.qReturn.qHandle; };
 
   // objetos de uma sheet (com layout)
-  const cacheSheet = {};
-  const objetos = async (sheetId) => {
+  const cacheSheet: Record<string, Objeto[]> = {};
+  const objetos = async (sheetId: string): Promise<Objeto[]> => {
     if (cacheSheet[sheetId]) return cacheSheet[sheetId];
     const so = await call(H, 'GetObject', [sheetId]);
     if (!so.result || !so.result.qReturn.qHandle) throw new Error('sheet nao encontrada: ' + sheetId);
     const sl = await layout(so.result.qReturn.qHandle);
-    const lista = [];
+    const lista: Objeto[] = [];
     for (const c of (sl.cells || [])) {
       const o = await call(H, 'GetObject', [c.name]);
       if (!o.result || !o.result.qReturn.qHandle) continue;
@@ -40,15 +47,15 @@ export const engine = ([wsurl, job]) => new Promise((res) => {
       const hc = L.qHyperCube || {};
       lista.push({id: c.name, tipo: c.type, h, L, hc,
         titulo: String(L.title || (L.qMeta && L.qMeta.title) || ''),
-        dims: (hc.qDimensionInfo || []).map((d) => d.qFallbackTitle),
-        meds: (hc.qMeasureInfo || []).map((m) => m.qFallbackTitle)});
+        dims: (hc.qDimensionInfo || []).map((d: Qlik) => d.qFallbackTitle),
+        meds: (hc.qMeasureInfo || []).map((m: Qlik) => m.qFallbackTitle)});
     }
     return (cacheSheet[sheetId] = lista);
   };
-  const tem = (lista, sub) => (lista || []).findIndex((x) => String(x).toLowerCase().includes(String(sub).toLowerCase()));
-  const igual = (lista, v) => (lista || []).findIndex((x) => String(x).trim().toLowerCase() === String(v).trim().toLowerCase());
-  const idxMedida = (o, m) => m.medida !== undefined ? igual(o.meds, m.medida) : (m.medida_contem !== undefined ? tem(o.meds, m.medida_contem) : -2);
-  const acha = (lista, m) => {
+  const tem = (lista: string[], sub: string) => (lista || []).findIndex((x) => String(x).toLowerCase().includes(String(sub).toLowerCase()));
+  const igual = (lista: string[], v: string) => (lista || []).findIndex((x) => String(x).trim().toLowerCase() === String(v).trim().toLowerCase());
+  const idxMedida = (o: Objeto, m: ItemJob) => m.medida !== undefined ? igual(o.meds, m.medida) : (m.medida_contem !== undefined ? tem(o.meds, m.medida_contem) : -2);
+  const acha = (lista: Objeto[], m: ItemJob) => {
     const c = lista.filter((o) => {
       if (m.objeto && o.tipo !== m.objeto) return false;
       if (m.titulo_contem !== undefined && !o.titulo.toLowerCase().includes(m.titulo_contem.toLowerCase())) return false;
@@ -57,14 +64,14 @@ export const engine = ([wsurl, job]) => new Promise((res) => {
       const im = idxMedida(o, m); if (im === -1) return false;
       return true;
     });
-    return {obj: c[m.n || 0], total: c.length};
+    return {obj: c[m.n || 0] as Objeto | undefined, total: c.length};
   };
   // cubo próprio (modo reto) a partir das propriedades de um objeto existente
-  const cuboDoObjeto = async (o, maxLinhas) => {
+  const cuboDoObjeto = async (o: Objeto, maxLinhas: number): Promise<Cubo> => {
     const pr = await call(o.h, 'GetProperties', []);
     if (!pr.result.qProp.qHyperCubeDef) {   // objeto sem definição de cubo nas propriedades: lê pelo próprio layout/dados do objeto
-      const hc0 = o.hc || {}, w0 = (hc0.qSize && hc0.qSize.qcx) || 0, tot0 = (hc0.qSize && hc0.qSize.qcy) || 0, linhas0 = [];
-      const colunas0 = (hc0.qDimensionInfo || []).map((d) => d.qFallbackTitle).concat((hc0.qMeasureInfo || []).map((m) => m.qFallbackTitle));
+      const hc0 = o.hc || {}, w0 = (hc0.qSize && hc0.qSize.qcx) || 0, tot0 = (hc0.qSize && hc0.qSize.qcy) || 0, linhas0: Qlik[][] = [];
+      const colunas0: string[] = (hc0.qDimensionInfo || []).map((d: Qlik) => d.qFallbackTitle).concat((hc0.qMeasureInfo || []).map((m: Qlik) => m.qFallbackTitle));
       for (let top = 0; top < Math.min(tot0, maxLinhas); top += 500) {
         const d0 = await call(o.h, 'GetHyperCubeData', ['/qHyperCubeDef', [{qTop: top, qLeft: 0, qHeight: Math.min(500, maxLinhas - top), qWidth: Math.max(w0, 1)}]]);
         if (!d0.result) throw new Error('sem qHyperCubeDef e sem dados no layout: ' + JSON.stringify(d0.error));
@@ -78,11 +85,11 @@ export const engine = ([wsurl, job]) => new Promise((res) => {
     const h = await sessao({qInfo: {qId: 'c' + (++id), qType: 'c'}, qHyperCubeDef: def});
     const L = await layout(h); const hc = L.qHyperCube;
     // colunas ocultas por condição (qError / sem título) não vêm nos dados: não rotular, senão os cabeçalhos deslocam
-    const visiveis = (l) => (l || []).filter((x) => !x.qError && x.qFallbackTitle);
-    let colunas = visiveis(hc.qDimensionInfo).map((d) => d.qFallbackTitle).concat(visiveis(hc.qMeasureInfo).map((m) => m.qFallbackTitle));
-    if (colunas.length !== hc.qSize.qcx) colunas = (hc.qDimensionInfo || []).map((d) => d.qFallbackTitle).concat((hc.qMeasureInfo || []).map((m) => m.qFallbackTitle));
-    const total = hc.qSize.qcy, lw = hc.qSize.qcx || w;
-    const linhas = [], passo = Math.max(1, Math.floor(9000 / Math.max(lw, 1)));
+    const visiveis = (l: Qlik[]) => (l || []).filter((x) => !x.qError && x.qFallbackTitle);
+    let colunas: string[] = visiveis(hc.qDimensionInfo).map((d) => d.qFallbackTitle).concat(visiveis(hc.qMeasureInfo).map((m) => m.qFallbackTitle));
+    if (colunas.length !== hc.qSize.qcx) colunas = (hc.qDimensionInfo || []).map((d: Qlik) => d.qFallbackTitle).concat((hc.qMeasureInfo || []).map((m: Qlik) => m.qFallbackTitle));
+    const total: number = hc.qSize.qcy, lw: number = hc.qSize.qcx || w;
+    const linhas: Qlik[][] = [], passo = Math.max(1, Math.floor(9000 / Math.max(lw, 1)));
     for (let top = 0; top < Math.min(total, maxLinhas); top += passo) {
       const d = await call(h, 'GetHyperCubeData', ['/qHyperCubeDef', [{qTop: top, qLeft: 0, qHeight: Math.min(passo, maxLinhas - top), qWidth: lw}]]);
       if (!d.result) throw new Error('GetHyperCubeData: ' + JSON.stringify(d.error));
@@ -92,14 +99,14 @@ export const engine = ([wsurl, job]) => new Promise((res) => {
   };
 
   // quantos valores do campo estão selecionados (0 => o filtro não pegou: números seriam do estado inteiro)
-  const nSel = async (campo, estado) => {
+  const nSel = async (campo: string, estado?: string): Promise<number> => {
     const h = await sessao({qInfo: {qId: 's' + (++id), qType: 's'}, qHyperCubeDef: {qMeasures: [{qDef: {qDef: estado ? ("GetSelectedCount([" + campo + "], False(), '" + estado + "')") :('GetSelectedCount([' + campo + '])')}}],
       qInitialDataFetch: [{qTop: 0, qLeft: 0, qHeight: 1, qWidth: 1}]}});
     const L = await layout(h);
     return L.qHyperCube.qDataPages[0].qMatrix[0][0].qNum;
   };
 
-  const tratar = {
+  const tratar: Record<ItemJob['tipo'], (it: ItemJob, sheetId: string) => Promise<ResultadoItem>> = {
     valor: async (it, sheetId) => {
       const lista = await objetos(sheetId); const {obj, total} = acha(lista, it);
       if (!obj) return {erro: 'objeto nao encontrado', candidatos: total};
@@ -124,14 +131,15 @@ export const engine = ([wsurl, job]) => new Promise((res) => {
         linhas: c.linhas.map((r) => ({r: r.slice(0, c.nd).map((x) => x.qText), v: cel(r[c.nd + mi])}))};
     },
     cubo: async (it) => {
-      const nd = (it.dimensoes || []).length, w = nd + it.medidas.length;
+      const medidas = it.medidas || [];
+      const nd = (it.dimensoes || []).length, w = nd + medidas.length;
       const h = await sessao({qInfo: {qId: 'k' + (++id), qType: 'k'}, qHyperCubeDef: {
         qDimensions: (it.dimensoes || []).map((d) => ({qDef: {qFieldDefs: [d]}})),
-        qMeasures: it.medidas.map((m) => ({qDef: {qDef: m}})),
+        qMeasures: medidas.map((m) => ({qDef: {qDef: m}})),
         qInitialDataFetch: [{qTop: 0, qLeft: 0, qHeight: 1, qWidth: w}]}});
       const L0 = await layout(h);
-      const total = L0.qHyperCube.qSize.qcy, max = Math.min(total, it.max_linhas || 20000), passo = Math.max(1, Math.floor(9000 / w));
-      const linhas = [];
+      const total: number = L0.qHyperCube.qSize.qcy, max = Math.min(total, it.max_linhas || 20000), passo = Math.max(1, Math.floor(9000 / w));
+      const linhas: Celula[][] = [];
       for (let top = 0; top < max; top += passo) {
         const d = await call(h, 'GetHyperCubeData', ['/qHyperCubeDef', [{qTop: top, qLeft: 0, qHeight: Math.min(passo, max - top), qWidth: w}]]);
         if (!d.result) throw new Error('GetHyperCubeData: ' + JSON.stringify(d.error));
@@ -150,10 +158,10 @@ export const engine = ([wsurl, job]) => new Promise((res) => {
     },
     // valores das expressões numéricas dos advanced-kpi de uma sheet (as mesmas que o painel exibe), com os filtros atuais
     exprs: async (it, sheetId) => {
-      const lista = await objetos(it.sheet || sheetId), vistas = new Set(), saida = [];
-      const achar = (o, acc) => { if (o == null) return; if (typeof o === 'string') { acc.push(o); return; } if (typeof o === 'object') for (const k of Object.keys(o)) achar(o[k], acc); };
+      const lista = await objetos(it.sheet || sheetId), vistas = new Set<string>(), saida: { expr: string; txt: string; num: number | null; titulo: string }[] = [];
+      const achar = (o: unknown, acc: string[]) => { if (o == null) return; if (typeof o === 'string') { acc.push(o); return; } if (typeof o === 'object') for (const k of Object.keys(o)) achar((o as Record<string, unknown>)[k], acc); };
       for (const o of lista.filter((x) => x.tipo === (it.objeto || 'advanced-kpi'))) {
-        const pr = await call(o.h, 'GetProperties', []), tudo = []; achar(pr.result.qProp, tudo);
+        const pr = await call(o.h, 'GetProperties', []), tudo: string[] = []; achar(pr.result.qProp, tudo);
         for (const e of tudo.filter((t) => /^\s*=/.test(t) && /sum\(|count\(|avg\(/i.test(t) && !/background-/i.test(t))) {
           const expr = e.replace(/^\s*=/, ''); if (vistas.has(expr)) continue; vistas.add(expr);
           try {
@@ -170,7 +178,7 @@ export const engine = ([wsurl, job]) => new Promise((res) => {
         qInitialDataFetch: [{qTop: 0, qLeft: 0, qHeight: 0, qWidth: 0}]}});
       const L = (await layout(h)).qListObject;
       if (L.qDimensionInfo && L.qDimensionInfo.qError) throw new Error('campo nao existe no painel: ' + it.campo);
-      const total = L.qSize.qcy, max = Math.min(total, it.max_linhas || 20000), valores = [];
+      const total: number = L.qSize.qcy, max = Math.min(total, it.max_linhas || 20000), valores: { txt: string; estado: string }[] = [];
       for (let top = 0; top < max; top += 5000) {
         const d = await call(h, 'GetListObjectData', ['/qListObjectDef', [{qTop: top, qLeft: 0, qHeight: Math.min(5000, max - top), qWidth: 1}]]);
         if (!d.result) throw new Error('GetListObjectData: ' + JSON.stringify(d.error));
@@ -192,7 +200,7 @@ export const engine = ([wsurl, job]) => new Promise((res) => {
       const od = await call(-1, 'OpenDoc', [wsurl.split('/app/')[1].split('?')[0]]);
       if (od.error) return fim({erro: 'OpenDoc: ' + JSON.stringify(od.error)});
       H = od.result.qReturn.qHandle;
-      const out = {selecoes: [], itens: {}};
+      const out: ResultadoOk = {selecoes: [], itens: {}};
       for (const [campo, valor, estado] of (job.selecoes || [])) {
         const f = await call(H, 'GetField', estado ? [campo, estado] : [campo]);
         // valor em lista => seleção por valor exato (evita que '> 30 dias' seja lido como busca numérica)
@@ -207,10 +215,10 @@ export const engine = ([wsurl, job]) => new Promise((res) => {
           qInitialDataFetch: [{qTop: 0, qLeft: 0, qHeight: 1000, qWidth: 1}]}});
         const L = (await layout(lh)).qListObject;
         // ordena por valor numérico; se o campo for texto dd/mm/aaaa, pela data
-        const chave = (c) => { if (num(c) !== null) return c.qNum; const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(c.qText || ''); return m ? (+m[3]) * 10000 + (+m[2]) * 100 + (+m[1]) : null; };
-        const cands = ((L.qDataPages[0] || {qMatrix: []}).qMatrix).map((r) => r[0]).filter((c) => c.qState !== 'X' && chave(c) !== null);
+        const chave = (c: Qlik): number | null => { if (num(c) !== null) return c.qNum; const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(c.qText || ''); return m ? (+m[3]) * 10000 + (+m[2]) * 100 + (+m[1]) : null; };
+        const cands: Qlik[] = ((L.qDataPages[0] || {qMatrix: []}).qMatrix).map((r: Qlik) => r[0]).filter((c: Qlik) => c.qState !== 'X' && chave(c) !== null);
         if (!cands.length) { out.selecoes.push({campo: d.campo, valor: null, ok: false, dinamico: true}); continue; }
-        cands.sort((a, b) => chave(b) - chave(a));
+        cands.sort((a, b) => (chave(b) as number) - (chave(a) as number));
         await call(lh, 'SelectListObjectValues', ['/qListObjectDef', [cands[0].qElemNumber], false]);
         out.selecoes.push({campo: d.campo, valor: cands[0].qText, ok: (await nSel(d.campo, d.estado)) >= 1, dinamico: true});
       }
@@ -226,10 +234,10 @@ export const engine = ([wsurl, job]) => new Promise((res) => {
             varAtual[nome] = Number(valor); mudou = true;
           }
           if (mudou) for (const k of Object.keys(cacheSheet)) delete cacheSheet[k];   // layouts guardados ficam velhos depois de mudar a variável
-          out.itens[it.nome] = await tratar[it.tipo](it, it.sheet || job.sheet); }
-        catch (e) { out.itens[it.nome] = {erro: String(e.message || e)}; }
+          out.itens[it.nome] = await tratar[it.tipo](it, (it.sheet || job.sheet) as string); }
+        catch (e) { out.itens[it.nome] = {erro: String((e as Error).message || e)}; }
       }
       fim(out);
-    } catch (e) { fim({erro: String(e.message || e)}); }
+    } catch (e) { fim({erro: String((e as Error).message || e)}); }
   };
 });

@@ -6,19 +6,23 @@ import { Navegador } from './qlik.js';
 import { coletarPainel } from './coleta.js';
 import * as conclusoes from './conclusoes.js';
 import * as listas from './listas.js';
+import type { NivelLog, Paineis } from './tipos.js';
 
 const TRAVA = 'rotinaEmAndamento';
 const TRAVA_MAX_MS = 45 * 60 * 1000;   // trava abandonada (aba fechada no meio) expira
 
+export type Log = (texto: string, nivel?: NivelLog) => void;
+export interface Opcoes { todos?: boolean; paineis?: string[] }
+
 // Quais painéis coletar hoje, conforme a frequência (diaria | semanal | mensal | mensal_dia15). Porte de app/devidos.py.
-export async function devidos(paineis, hoje = new Date()) {
-  const ids = [];
-  const diaIso = (d) => d.toISOString().slice(0, 10);
+export async function devidos(paineis: Paineis, hoje = new Date()): Promise<string[]> {
+  const ids: string[] = [];
+  const diaIso = (d: Date) => d.toISOString().slice(0, 10);
   for (const [pid, p] of Object.entries(paineis)) {
     if (pid === 'conclusoes_pje') continue;   // coletado pelo módulo de conclusões
     const ult = await db.ultimaOk(pid);
     const dUlt = ult ? new Date(ult.iniciada) : null;
-    const dias = dUlt ? (hoje - dUlt) / 864e5 : Infinity;
+    const dias = dUlt ? (hoje.getTime() - dUlt.getTime()) / 864e5 : Infinity;
     const freq = p.frequencia || 'diaria';
     if (freq === 'semanal' || freq === 'mensal') { if (dias >= 7) ids.push(pid); }
     else if (freq === 'mensal_dia15') {
@@ -29,13 +33,13 @@ export async function devidos(paineis, hoje = new Date()) {
   return ids;
 }
 
-export async function emAndamento() {
-  const t = (await chrome.storage.session.get(TRAVA))[TRAVA];
+export async function emAndamento(): Promise<number | null> {
+  const t = (await chrome.storage.session.get(TRAVA))[TRAVA] as number | undefined;
   return t && Date.now() - t < TRAVA_MAX_MS ? t : null;
 }
 
 // log(texto, nível) recebe o progresso. opcoes: {todos: true} ignora as frequências; {paineis: [ids]} só esses.
-export async function executar(log = () => {}, opcoes = {}) {
+export async function executar(log: Log = () => {}, opcoes: Opcoes = {}): Promise<{ codigo: 0 | 1 | 2 }> {
   if (await emAndamento()) { log('Já há uma coleta em andamento (outra aba). Aguarde ela terminar.', 'erro'); return { codigo: 2 }; }
   await chrome.storage.session.set({ [TRAVA]: Date.now() });
   const { comarca } = await prefs();
@@ -73,7 +77,7 @@ export async function executar(log = () => {}, opcoes = {}) {
     log(falhas ? `Concluído com ${falhas} falha(s). O painel mostra o último dado bom de cada fonte.` : 'Concluído.', falhas ? 'aviso' : 'ok');
     return { codigo: falhas ? 1 : 0 };
   } catch (e) {
-    log(String(e.message || e), 'erro');
+    log(String((e as Error).message || e), 'erro');
     return { codigo: 1 };
   } finally {
     await nav.fechar();

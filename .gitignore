@@ -3,3 +3,7 @@
 *.crx
 *.pem
 node_modules/
+# JS gerado pelo tsc a partir dos .ts (npm run build)
+src/*.js
+pages/coleta.js
+pages/painel/carregar.js

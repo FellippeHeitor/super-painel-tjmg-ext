@@ -4,12 +4,13 @@ import { valoresDoCampo, normalizar } from '../src/comarca.js';
 import { nomeComarca } from '../src/dados.js';
 import * as rotina from '../src/rotina.js';
 import * as db from '../src/db.js';
+import type { NivelLog } from '../src/tipos.js';
 
-const $ = (id) => document.getElementById(id);
+const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const REFERENCIA = 'dados_estrategicos';   // painel com todas as comarcas do 1º grau (PJe/SEEU/SISCOM)
 const auto = new URLSearchParams(location.search).get('auto') === '1';
 
-function log(texto, nivel = '') {
+function log(texto: string, nivel: NivelLog = '') {
   const li = document.createElement('li');
   li.textContent = `${new Date().toLocaleTimeString('pt-BR')} · ${texto}`;
   if (nivel) li.className = nivel;
@@ -17,12 +18,12 @@ function log(texto, nivel = '') {
   li.scrollIntoView({ block: 'nearest' });
 }
 
-const botoes = () => ['btSalvar', 'btLista', 'btTudo', 'btDevidos', 'btApagar'].map($);
-const ocupar = (sim) => botoes().forEach((b) => { b.disabled = sim; });
+const botoes = () => ['btSalvar', 'btLista', 'btTudo', 'btDevidos', 'btApagar'].map((id) => $<HTMLButtonElement>(id));
+const ocupar = (sim: boolean) => botoes().forEach((b) => { b.disabled = sim; });
 
-function mostrarComarca(c) {
+function mostrarComarca(c: string | null) {
   $('topo-comarca').textContent = c ? 'Comarca de ' + nomeComarca(c) : '';
-  if (c) $('inComarca').value = c;
+  if (c) $<HTMLInputElement>('inComarca').value = c;
 }
 
 async function carregarLista() {
@@ -39,18 +40,18 @@ async function carregarLista() {
   }
 }
 
-function preencher(lista) {
+function preencher(lista: string[]) {
   $('dlComarcas').replaceChildren(...lista.map((c) => Object.assign(document.createElement('option'), { value: c })));
 }
 
 $('btLista').onclick = async () => {
   ocupar(true);
-  try { await carregarLista(); } catch (e) { $('stComarca').textContent = 'Erro: ' + e.message; } finally { ocupar(false); }
+  try { await carregarLista(); } catch (e) { $('stComarca').textContent = 'Erro: ' + (e as Error).message; } finally { ocupar(false); }
 };
 
 $('btSalvar').onclick = async () => {
   const { comarca, comarcas } = await prefs();
-  const v = comarcas.find((c) => normalizar(c) === normalizar($('inComarca').value));
+  const v = comarcas.find((c) => normalizar(c) === normalizar($<HTMLInputElement>('inComarca').value));
   if (!v) { $('stComarca').textContent = 'Escolha um nome da lista (carregada do Qlik).'; return; }
   if (comarca && normalizar(comarca) !== normalizar(v)) {
     if (!confirm(`Trocar a comarca para ${nomeComarca(v)} apaga os dados coletados de ${nomeComarca(comarca)} neste navegador. Continuar?`)) return;
@@ -61,7 +62,7 @@ $('btSalvar').onclick = async () => {
   $('stComarca').textContent = `Comarca: ${nomeComarca(v)}. Agora clique em "Coletar agora".`;
 };
 
-async function rodar(opcoes) {
+async function rodar(opcoes: rotina.Opcoes) {
   ocupar(true);
   $('log').replaceChildren();
   try {
@@ -76,14 +77,15 @@ async function rodar(opcoes) {
 $('btTudo').onclick = () => rodar({ todos: true });
 $('btDevidos').onclick = () => rodar({});
 
+const ckAuto = $<HTMLInputElement>('ckAuto');
 $('btAuto').onclick = async () => {
-  const horarios = $('inHorarios').value.split(/[,;\s]+/).filter(Boolean);
+  const horarios = $<HTMLInputElement>('inHorarios').value.split(/[,;\s]+/).filter(Boolean);
   if (!horarios.every((h) => /^([01]\d|2[0-3]):[0-5]\d$/.test(h))) { $('stAuto').textContent = 'Use o formato HH:MM, separados por vírgula.'; return; }
-  await salvarPrefs({ automatico: $('ckAuto').checked, horarios });
+  await salvarPrefs({ automatico: ckAuto.checked, horarios });
   await chrome.runtime.sendMessage({ tipo: 'agendar' });
-  $('stAuto').textContent = $('ckAuto').checked ? `Coleta automática às ${horarios.join(', ')}.` : 'Coleta automática desligada.';
+  $('stAuto').textContent = ckAuto.checked ? `Coleta automática às ${horarios.join(', ')}.` : 'Coleta automática desligada.';
 };
-$('ckAuto').onchange = () => $('btAuto').click();
+ckAuto.onchange = () => $('btAuto').click();
 
 $('btApagar').onclick = async () => {
   if (!confirm('Apagar todas as coletas e relações de processos deste navegador?')) return;
@@ -95,15 +97,15 @@ $('btApagar').onclick = async () => {
 const p = await prefs();
 preencher(p.comarcas);
 mostrarComarca(p.comarca);
-$('ckAuto').checked = p.automatico;
-$('inHorarios').value = p.horarios.join(', ');
+ckAuto.checked = p.automatico;
+$<HTMLInputElement>('inHorarios').value = p.horarios.join(', ');
 if (auto) {
   log('Coleta automática.');
   const r = await rodar({});
   if (r.codigo === 0) setTimeout(() => window.close(), 5000);   // com falha, a aba fica aberta para o usuário ver o motivo
 } else if (!p.comarcas.length) {
   ocupar(true);
-  try { await carregarLista(); } catch (e) { $('stComarca').textContent = 'Não foi possível ler a lista de comarcas: ' + e.message; } finally { ocupar(false); }
+  try { await carregarLista(); } catch (e) { $('stComarca').textContent = 'Não foi possível ler a lista de comarcas: ' + (e as Error).message; } finally { ocupar(false); }
 } else if (!p.comarca) {
   $('stComarca').textContent = 'Escolha a comarca.';
 }

@@ -1,0 +1,14 @@
+{
+  "name": "super-painel-tjmg-ext",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.3.4",
+    "typescript": "^5.8.3"
+  }
+}

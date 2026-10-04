@@ -9,7 +9,7 @@ chrome.action.onClicked.addListener(() => {
 });
 
 // próximo horário HH:MM (hoje, se ainda não passou; senão amanhã)
-function proximo(hhmm) {
+function proximo(hhmm: string): number {
   const [h, m] = hhmm.split(':').map(Number);
   const d = new Date();
   d.setHours(h, m, 0, 0);
@@ -33,7 +33,7 @@ chrome.alarms.onAlarm.addListener(async (a) => {
   await chrome.tabs.create({ url, active: false });
 });
 
-chrome.runtime.onMessage.addListener((msg, _rem, responder) => {
+chrome.runtime.onMessage.addListener((msg: { tipo?: string } | undefined, _rem, responder) => {
   if (msg && msg.tipo === 'agendar') { agendar().then(() => responder(true)); return true; }
   return false;
 });

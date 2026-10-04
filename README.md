@@ -10,9 +10,10 @@ Sucessor do robô em Python/Playwright do Super Painel TJMG, que exigia um PC de
 
 ## Instalar
 
-1. `chrome://extensions` → ligar o **Modo do desenvolvedor**.
-2. **Carregar sem compactação** → selecionar esta pasta.
-3. Clicar no ícone da extensão → abre o painel. Na primeira vez: **Escolher a comarca e coletar os dados**.
+1. `npm install` e `npm run build` (o código é TypeScript; o `tsc` gera os `.js` ao lado dos `.ts`). Depois de mudar um `.ts`: `npm run build` (ou `npm run watch`) e recarregar a extensão.
+2. `chrome://extensions` → ligar o **Modo do desenvolvedor**.
+3. **Carregar sem compactação** → selecionar esta pasta.
+4. Clicar no ícone da extensão → abre o painel. Na primeira vez: **Escolher a comarca e coletar os dados**.
 
 ## Uso
 
@@ -27,15 +28,17 @@ Sucessor do robô em Python/Playwright do Super Painel TJMG, que exigia um PC de
 | `manifest.json` | MV3; permissões `tabs`, `scripting`, `storage`, `alarms`; acesso só a `qlik.tjmg.jus.br` |
 | `config/paineis.json` | appid/sheet, campo de comarca, KPIs, séries e frequência de cada painel (convertido do robô) |
 | `config/site.json` | seções do painel por painel de origem (lista de permissão) |
-| `src/gancho-ws.js` | roda na página do Qlik e anota a URL do WebSocket da Engine (com o token CSRF da sessão anônima) |
-| `src/qlik.js` | aba de trabalho em segundo plano, repetição de tentativas, diálogo "Conexão perdida" |
-| `src/engine.js` | jobs na Engine API (seleções, KPIs, séries, tabelas, valores de campo), roda dentro da aba do Qlik |
-| `src/comarca.js` | grafia da comarca em cada app (com cache) |
-| `src/coleta.js`, `src/conclusoes.js`, `src/listas.js` | coleta por painel, conclusões PJe + eProc, relações de processos e listas do Apoio sem duplicidade |
-| `src/rotina.js` | rotina completa (painéis devidos + conclusões + Apoio), com trava contra execução dupla |
-| `src/db.js` | IndexedDB: histórico de coletas (última de cada dia, 120 dias) e relações de processos |
-| `src/dados.js` | monta os dados do painel a partir das coletas (porte do `site.py`) |
-| `pages/painel.html`, `pages/painel/*.js` | o painel (o mesmo front-end do site anterior) |
+| `tsconfig.json` | TypeScript (`tsc`, sem bundler); os `.js` gerados não vão para o repositório |
+| `src/tipos.ts` | tipos da config, dos jobs/resultados do engine e dos registros do IndexedDB |
+| `src/gancho-ws.ts` | roda na página do Qlik e anota a URL do WebSocket da Engine (com o token CSRF da sessão anônima) |
+| `src/qlik.ts` | aba de trabalho em segundo plano, repetição de tentativas, diálogo "Conexão perdida" |
+| `src/engine.ts` | jobs na Engine API (seleções, KPIs, séries, tabelas, valores de campo), roda dentro da aba do Qlik |
+| `src/comarca.ts` | grafia da comarca em cada app (com cache) |
+| `src/coleta.ts`, `src/conclusoes.ts`, `src/listas.ts` | coleta por painel, conclusões PJe + eProc, relações de processos e listas do Apoio sem duplicidade |
+| `src/rotina.ts` | rotina completa (painéis devidos + conclusões + Apoio), com trava contra execução dupla |
+| `src/db.ts` | IndexedDB: histórico de coletas (última de cada dia, 120 dias) e relações de processos |
+| `src/dados.ts` | monta os dados do painel a partir das coletas (porte do `site.py`) |
+| `pages/painel.html`, `pages/painel/*.js` | o painel (o mesmo front-end do site anterior, mantido em JavaScript); `carregar.ts` monta os dados |
 | `pages/coleta.*` | comarca, coleta com progresso, agendamento, apagar dados |
 
 ## Créditos
